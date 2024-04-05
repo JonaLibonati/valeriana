@@ -9,7 +9,7 @@ import { SeletedDate } from './subcomponents/SeletedDate';
 import { Date } from './subcomponents/Date';
 import { Hour } from './subcomponents/Hour';
 
-export const Calendar = () => {
+export const CalendarPage = () => {
 
     const { days, dayAbbr, monthSelector, yearSelector } = useContext(DateContext);
 

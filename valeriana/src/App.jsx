@@ -1,12 +1,11 @@
-
-import { Calendar } from "./components/calendar/Calendar"
-import { DateProvider } from "./contexts/DateContext"
+import { DateProvider } from "./contexts/DateContext";
+import { ValerianaRouter } from "./router/ValerianaRouter";
 
 function App() {
 
   return (
     <DateProvider>
-      <Calendar />
+      <ValerianaRouter></ValerianaRouter>
     </DateProvider>
   )
 }
