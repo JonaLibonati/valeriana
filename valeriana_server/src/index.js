@@ -1,8 +1,9 @@
 import express from 'express';
 import crypto from 'node:crypto';
-import z from 'zod'; // Used to validate Request.
+import 'dotenv/config';
 import { corsMiddleware } from './middlewares/cors.js';
 import { usersRouter } from './routes/v1/users.js';
+import cookieParser from 'cookie-parser';
 
 // Reading a JSON with ESM.
 // import { createRequire } from 'node:module';
@@ -13,10 +14,11 @@ const app = express();
 
 app.disable('x-powered-by');
 
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT;
 
 app.use(express.json()); // midleware to receive json from a POST request
 app.use(corsMiddleware());
+app.use(cookieParser())
 
 app.get('/', (req, res) => {
     //res.send('<h1>Hola mundo</h1>')

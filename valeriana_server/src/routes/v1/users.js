@@ -1,11 +1,26 @@
 import { Router } from "express";
 import { UserController } from "../../controllers/users.js";
 import { UserMiddelwares } from "../../middlewares/users.js";
+import { TokenMiddleware } from "../../middlewares/token.js";
 
 export const usersRouter = Router();
 
-usersRouter.post ('/', UserMiddelwares.hashPassword, UserController.create);
+usersRouter.get ('/', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.getUser);
+
+usersRouter.post ('/', UserMiddelwares.validateUserInput, UserMiddelwares.hashPassword, UserController.create);
 
 usersRouter.delete ('/', UserController.deleteById)
 
+usersRouter.get ('/self', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.getSelfUser)
+
 usersRouter.post ('/login', UserMiddelwares.checkpassword, UserController.login)
+
+usersRouter.get ('/logout', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.logout)
+
+usersRouter.patch ('/validate/email', TokenMiddleware.validate, UserController.validateEmail)
+
+usersRouter.get ('/validate/PasswordEmail', TokenMiddleware.validate, UserController.validateEmail)
+
+usersRouter.get ('/send/VerificationEmail', TokenMiddleware.validate, UserController.sendVerificationEmail)
+
+usersRouter.post ('/send/PasswordEmail', UserController.sendPasswordEmail)
