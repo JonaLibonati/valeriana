@@ -1,0 +1,50 @@
+CREATE DATABASE valeriana_db;
+
+SHOW DATABASES;
+
+USE valeriana_db;
+
+DROP TABLE users;
+
+CREATE TABLE users (
+	user_id BINARY(16) DEFAULT (UUID_TO_BIN(uuid())),
+    user_name VARCHAR(50) NOT NULL UNIQUE,
+    user_roleId INT NOT NULL,
+	user_password VARCHAR(255) NOT NULL UNIQUE,
+    email_address VARCHAR(320) NOT NULL UNIQUE,
+    email_isValidated BOOLEAN NOT NULL DEFAULT (0),
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT (now()),
+    PRIMARY KEY(user_id)
+);
+
+DELETE FROM users WHERE user_id = UUID_TO_BIN('20a311b3-f21a-11ee-82c8-704d7b63e3fe');
+
+INSERT INTO users (user_name, user_roleId, user_password, email_address, first_name, last_name)
+VALUES
+('digital', '2','$2b$10$wPEWsw8T0M47UtMigExrneS4I0tGRE1rl0pdF93e3e5nNmrqoeRGe', 'jona@gmail.com', 'Jonathan', 'Libonati');
+
+DROP TABLE roles;
+
+CREATE TABLE roles (
+	role_id INT NOT NULL AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    PRIMARY KEY(role_id)
+);
+
+INSERT INTO roles (role_name) VALUES ('admin'), ('doctor'), ('patient');
+
+SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, user_password, email_address, email_isValidated, first_name, last_name, created_at FROM users;
+SELECT * FROM users WHERE user_id = UUID_TO_BIN('3cd8b37a-f216-11ee-82c8-704d7b63e3fe');
+SELECT * FROM roles;
+
+SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name FROM users WHERE user_name = 'digital';
+
+SELECT * FROM users INNER JOIN roles ON users.user_roleId = roles.role_id;
+
+DELETE FROM users WHERE user_id = UUID_TO_BIN('8d38b3bf-f218-11ee-82c8-704d7b63e3fe');
+
+SELECT email_isValidated FROM users WHERE user_id = UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe');
+
+UPDATE users SET email_isValidated = 0 WHERE user_id = UUID_TO_BIN('fffa077e-f6d5-11ee-9a3e-704d7b63e3fe');
