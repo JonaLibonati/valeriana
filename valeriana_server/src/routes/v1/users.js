@@ -19,8 +19,8 @@ usersRouter.get ('/logout', TokenMiddleware.validate, UserMiddelwares.isEmailVal
 
 usersRouter.patch ('/validate/email', TokenMiddleware.validate, UserController.validateEmail)
 
-usersRouter.get ('/validate/PasswordEmail', TokenMiddleware.validate, UserController.validateEmail)
+usersRouter.get ('/validate/passwordEmail', TokenMiddleware.validate, UserController.validateEmail)
 
-usersRouter.get ('/send/VerificationEmail', TokenMiddleware.validate, UserController.sendVerificationEmail)
+usersRouter.get ('/send/verificationEmail', TokenMiddleware.validate, UserController.sendVerificationEmail)
 
-usersRouter.post ('/send/PasswordEmail', UserController.sendPasswordEmail)
+usersRouter.post ('/send/passwordEmail', UserController.sendPasswordEmail)

@@ -1,5 +1,5 @@
 import { userLogin } from "../../api/userLogin";
-import { UserNewPassword, userNewPassword } from "../../api/userNewPassword";
+import { UserNewPassword } from "../../api/userNewPassword";
 
 export class LoginHelpers {
   static async handleSubmit(e, { errorElem, setErrorText }) {

@@ -55,9 +55,9 @@ export class UserController {
       }).json({message: 'logout successfully'});
     } catch (e) {
       console.error(e);
-      res.status(400);
+      res.status(400).send();
     }
-    res.send();
+    
   }
 
   static async getUser(req, res) {
@@ -94,9 +94,9 @@ export class UserController {
       const user = await UserModel.getUserEmail({ input: req.body.payload });
       console.log(user);
       if(user.email_isValidated !== 1) {
-        const emailRes = await sendEmail({html: html(token), subject: 'Correo de autentificación',to: 'libonati.jonathan@gmail.com'} );
+        const emailRes = await sendEmail({html: html, subject: 'Correo de autentificación',to: 'libonati.jonathan@gmail.com'} );
         if (emailRes.isSent) {
-          res.status(200).json({message: 'Email send'}).send();
+          res.status(200).json({...user, message: 'Email send'}).send();
         } else {
           res.status(400).json({code: 'ER_EMAIL_NO_SEND'}).send();
         }

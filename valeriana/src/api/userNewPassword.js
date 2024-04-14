@@ -7,14 +7,13 @@ export class UserNewPassword {
       },
       body: JSON.stringify(userData),
     };
-    const res = await fetch("/v1/users/send/PasswordEmail", options);
+    const res = await fetch("/v1/users/send/passwordEmail", options);
     const body = await res.json();
     return { res, body };
   }
 
   static async setNewPass() {
-
-    const res = await fetch("/v1/users/sendPasswordEmail", options);
+    const res = await fetch("/v1/users/validate/passwordEmail", options);
     const body = await res.json();
     return { res, body };
   }
