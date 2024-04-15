@@ -7,9 +7,8 @@ export const userCreate = async (userData) => {
       body: JSON.stringify(userData),
     };
 
-    const response = await fetch("/v1/users", options)
-      .then(res => res.json())
-      .catch(error => error);
+    const res = await fetch("/v1/users", options);
+    const body = await res.json();
 
-    return response;
+    return { res, body };
   };

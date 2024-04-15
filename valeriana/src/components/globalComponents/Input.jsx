@@ -12,6 +12,7 @@ export const Input = ({ name, type, placeholder, handleOnChange, vref }) => {
         onChange={handleOnChange? ((e) => handleOnChange(e)) : undefined}
         id={`${name}_id`}
         ref={vref}
+        value={undefined}
       />
     </div>
   );

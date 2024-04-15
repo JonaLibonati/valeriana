@@ -13,7 +13,7 @@ export class SelfUser {
   }
 
   static async getVerificationEmail() {
-    const res = await fetch("/v1/users/validate/sendVerificationEmail");
+    const res = await fetch("/v1/users/send/verificationEmail");
     const body = await res.json();
 
     if (res.status === 498 && body.code === 'ER_TOKEN_DENIED') {
@@ -34,7 +34,7 @@ export class SelfUser {
       body: JSON.stringify({ user_id }),
     };
 
-    const res = await fetch("/v1/users/validate/email", options);
+    const res = await fetch("/v1/users/self/email", options);
     const body = await res.json();
 
     if (res.status === 200 && body.email_isValidated === 1) {

@@ -12,15 +12,17 @@ usersRouter.post ('/', UserMiddelwares.validateUserInput, UserMiddelwares.hashPa
 usersRouter.delete ('/', UserController.deleteById)
 
 usersRouter.get ('/self', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.getSelfUser)
+usersRouter.patch ('/self/email', TokenMiddleware.validate, UserController.validateEmail)
+usersRouter.patch ('/self/password', TokenMiddleware.validateOldPassword, UserController.setSelfPassword)
 
 usersRouter.post ('/login', UserMiddelwares.checkpassword, UserController.login)
 
 usersRouter.get ('/logout', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.logout)
 
-usersRouter.patch ('/validate/email', TokenMiddleware.validate, UserController.validateEmail)
 
-usersRouter.get ('/validate/PasswordEmail', TokenMiddleware.validate, UserController.validateEmail)
 
-usersRouter.get ('/send/VerificationEmail', TokenMiddleware.validate, UserController.sendVerificationEmail)
+usersRouter.get ('/validate/passwordEmail', TokenMiddleware.validate, UserController.validateEmail)
 
-usersRouter.post ('/send/PasswordEmail', UserController.sendPasswordEmail)
+usersRouter.get ('/send/verificationEmail', TokenMiddleware.validate, UserController.sendVerificationEmail)
+
+usersRouter.post ('/send/passwordEmail', UserController.sendPasswordEmail)
