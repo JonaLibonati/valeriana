@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { Input } from "../globalComponents/Input";
 import { Submit } from "../globalComponents/Submit";
-import { validateUser } from "../../schemes/userSchema";
+import { validateNewPassword } from "../../schemes/userSchema";
 
 export const NewPassword = () => {
 
@@ -12,11 +12,11 @@ export const NewPassword = () => {
     e.preventDefault();
 
     const userData = {
-      email_address: e.target[0].value,
-      user_password: e.target[1].value,
+      user_password: e.target[0].value == ""? undefined : e.target[0].value,
+      confirm_password: e.target[1].value == ""? undefined : e.target[1].value,
     };
 
-    const user = validateUser(userData);
+    const user = validateNewPassword(userData);
 
     if (user.success) {
     /*  userCreate(user.data)

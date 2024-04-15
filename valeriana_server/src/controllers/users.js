@@ -81,6 +81,14 @@ export class UserController {
     }
   }
 
+  static async setSelfPassword(req, res) {
+    try {
+
+    } catch (e) {
+
+    }
+  }
+
   static async sendVerificationEmail(req, res) {
     const html = `
         <h1>Valeriana</h1>
