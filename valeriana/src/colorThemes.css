@@ -1,0 +1,51 @@
+:root {
+  --color-primary-dark: #fb7185;
+  --color-primary-base: #fda4af;
+  --color-primary-light: #fff1f2;
+  --color-secondary-base: rgb(156 163 175);
+  --color-secondary-light: #e5e7eb;
+  --color-tertiary-dark: rgb(0, 0, 0);
+  --color-tertiary-light: rgb(255, 255, 255);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary-dark: #7dd3fc;
+  --color-primary-base: #0ea5e9;
+  --color-primary-light: #292524;
+  --color-secondary-base: #a8a29e;
+  --color-secondary-light: #57534e;
+  --color-tertiary-dark: #e0f2fe;
+  --color-tertiary-light: #1c1917;
+  }
+}
+
+#theme[data-theme="dark"] {
+  --color-primary-dark: #7dd3fc;
+  --color-primary-base: #0ea5e9;
+  --color-primary-light: #292524;
+  --color-secondary-base: #a8a29e;
+  --color-secondary-light: #57534e;
+  --color-tertiary-dark: #e0f2fe;
+  --color-tertiary-light: #1c1917;
+}
+
+#theme[data-theme="lightRose"] {
+  --color-primary-dark: #fb7185;
+  --color-primary-base: #fda4af;
+  --color-primary-light: #fff1f2;
+  --color-secondary-base: rgb(156 163 175);
+  --color-secondary-light: #e5e7eb;
+  --color-tertiary-dark: rgb(0, 0, 0);
+  --color-tertiary-light: rgb(255, 255, 255);
+}
+
+#theme[data-theme="lightSky"] {
+  --color-primary-dark: #38bdf8;
+  --color-primary-base: #7dd3fc;
+  --color-primary-light: #f0f9ff;
+  --color-secondary-base: rgb(156 163 175);
+  --color-secondary-light: #e5e7eb;
+  --color-tertiary-dark: rgb(0, 0, 0);
+  --color-tertiary-light: rgb(255, 255, 255);
+}

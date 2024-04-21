@@ -1,81 +1,52 @@
-import React, { useContext } from "react";
-import { Input } from "../globalComponents/Input";
-import { Submit } from "../globalComponents/Submit";
+import React, { useContext, useState } from "react";
+import { Input } from "../globalComponents/input/Input";
+import { FilledButton } from "../globalComponents/Submit";
 import { UserContext } from "../../contexts/UserContext";
-import { validateUser } from "../../schemes/userSchema";
-import { userCreate } from "../../api/userCreate";
 import { Roles } from "./Roles";
 import { GoBackButton } from "../globalComponents/GoBackButton";
+import { RegisterHelpers } from "./registerHelpers";
+import { ErrorText, useErrorText } from "../globalComponents/ErrorText";
+import { Link } from "react-router-dom";
+import { Loading } from "../globalComponents/loading/Loading";
 
 export const Register = () => {
-  const { userData, setUserData, handleOnChange } = useContext(UserContext);
+  const { userData, setUserData } = useContext(UserContext);
+
+  const [userIsCreated, setUserIsCreated] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { errorText, errorTrigger, errorSetter } = useErrorText();
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const user = validateUser(userData);
-
-    if (user.success) {
-      userCreate(user.data)
-        .then((res) => {
-          console.log(res);
-          setUserData({});
-        })
-        .catch((res) => console.error(res.json()));
-    } else console.error(user.error);
+    const setters = { ...errorSetter, setIsLoading, setUserIsCreated };
+    RegisterHelpers.handleSubmit(e, {
+      userData,
+      setters
+    });
   };
 
   const handleGoBack = () => {
     setUserData((data) => ({ ...data, user_roleId: undefined }));
   };
 
-  const inputList = [
-    {
-      name: "first_name",
-      type: "text",
-      placeholder: "Nombre",
-    },
-    {
-      name: "last_name",
-      type: "text",
-      placeholder: "Apellido",
-    },
-    {
-      name: "user_name",
-      type: "text",
-      placeholder: "Nombre de Usuario",
-    },
-    {
-      name: "email_address",
-      type: "email",
-      placeholder: "eMail",
-    },
-    {
-      name: "confirm_email",
-      type: "email",
-      placeholder: "Confirmar eMail",
-    },
-    {
-      name: "user_password",
-      type: "password",
-      placeholder: "Contraseña",
-    },
-    {
-      name: "confirm_password",
-      type: "password",
-      placeholder: "Confirmar contraseña",
-      autocomplete: "off",
-    },
-  ];
-
   return (
     <>
       {userData.user_roleId === undefined ? (
         <Roles />
+      ) : userIsCreated ? (
+        <>
+          <p className="text-lg mt-4 text-secondary-base">
+            Usuario creado correctamente!
+          </p>
+          <button className="text-primary-dark mt-4">
+            <Link to={"/app/login"}>Volver al login</Link>
+          </button>
+        </>
       ) : (
         <>
           <GoBackButton handleClick={handleGoBack} />
-          <p className="text-4xl mt-4 mb-4 text-gray-400">
+          <p className="text-4xl mt-4 mb-4 text-secondary-base">
             {userData.user_roleId === "2"
               ? "Doctor/a"
               : userData.user_roleId === "3"
@@ -84,16 +55,21 @@ export const Register = () => {
             , ¿Quien&nbsp;eres?
           </p>
           <form className="flex flex-wrap" onSubmit={handleSubmit}>
-            {inputList.map((elem) => (
+            {RegisterHelpers.inputList.map((elem) => (
               <Input
                 key={elem.name}
                 name={elem.name}
                 type={elem.type}
                 placeholder={elem.placeholder}
-                handleOnChange={handleOnChange}
+                maxLength={elem.maxlength}
               />
             ))}
-            <Submit text={"Crear"} />
+            <ErrorText errorText={errorText} errorTrigger={errorTrigger} />
+            <FilledButton>
+              <Loading isLoading={isLoading} color={"bg-tertiary-light"}>
+                <input value="Crear" type="submit" />
+              </Loading>
+            </FilledButton>
           </form>
         </>
       )}

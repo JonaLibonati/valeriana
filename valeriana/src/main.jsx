@@ -9,8 +9,11 @@ import { ValidateEmailPage } from "./pages/ValidateEmailPage";
 import { NewPasswordPage } from "./pages/NewPasswordPage";
 import { WelcomeDashboard } from "./components/welcomeDashboard/WelcomeDashboard";
 import { UserDashboard } from "./components/userDashboard/UserDashboard";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import "./poppins.css";
+import "./sacramento.css";
 import "./index.css";
+import "./colorThemes.css";
 
 const router = createBrowserRouter([
   {
@@ -24,31 +27,33 @@ const router = createBrowserRouter([
       },
       {
         path: "register",
-        element: <RegisterPage />
+        element: <RegisterPage />,
       },
       {
         path: "validate/:user_id",
-        element: <ValidateEmailPage />
+        element: <ValidateEmailPage />,
       },
       {
         path: "validate/",
-        element: <ValidatePage />
+        element: <ValidatePage />,
       },
       {
         path: "password/:token",
-        element: <NewPasswordPage />
-      }
+        element: <NewPasswordPage />,
+      },
     ],
   },
   {
-    path: '/app/user',
+    path: "/app/user",
     element: <UserDashboard />,
-    errorElement: <ErrorPage />
-  }
+    errorElement: <ErrorPage />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );

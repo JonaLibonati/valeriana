@@ -3,7 +3,7 @@ import React from "react";
 export const GoBackButton = ({ handleClick }) => {
   return (
     <button
-      className="p-2 bg-rose-300 text-white rounded-full"
+      className="p-2 bg-primary-base text-tertiary-light rounded-full"
       onClick={handleClick}
     >
       <svg

@@ -57,6 +57,14 @@ export class UserModel {
         return user[0];
     }
 
+    static async setPassword ({ input }) {
+
+        const { email_address, user_password } = input;
+        await connection.query(
+            'UPDATE users SET user_password = ? WHERE email_address = ?;', [user_password, email_address]
+        );
+    }
+
     static async isEmailValidated ({ input }) {
 
         const { user_id } = input;

@@ -35,8 +35,6 @@ const validateToken = (token) => {
     console.log(payload)
     if (payload) {
       return { isValid: true, payload: payload }
-      req.body.payload = payload;
-      next()
     } else {
       // Access Denied
       return { isValid: false, code: 'ER_TOKEN_DENIED' }
@@ -45,6 +43,5 @@ const validateToken = (token) => {
     // Access Denied
     console.error(error)
     return { isValid: false, code: 'ER_TOKEN_DENIED' }
-    res.status(498).json({ code: 'ER_TOKEN_DENIED' });
   }
 }

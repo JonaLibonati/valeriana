@@ -9,9 +9,13 @@ export class UserController {
       res.status(201).json(newUser);
     } catch (e) {
       console.error(e);
-      if (e.code === "ER_DUP_ENTRY")
-        res.status(400).json({ code: "ER_DUP_ENTRY" });
-      else res.status(400);
+      if (e.code === "ER_DUP_ENTRY") {
+        if (e.sqlMessage.includes("users.email_address") === true)
+          res.status(400).json({ code: "ER_DUP_ENTRY_EMAIL" });
+        else if (e.sqlMessage.includes("users.user_name") === true)
+          res.status(400).json({ code: "ER_DUP_ENTRY_USER_NAME" });
+        else res.status(400).json({ code: "ER_DUP_ENTRY" });
+      } else res.status(400);
     }
     res.send();
   }
@@ -34,11 +38,14 @@ export class UserController {
       const secretKey = process.env.JWT_SECRET_KEY;
       const expiration = "24h"; // Token will expire in 1 hour
       const token = jwt.sign(payload, secretKey, { expiresIn: expiration });
-      res.status(200).cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      }).json({message: 'login successfully'});
+      res
+        .status(200)
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        })
+        .json({ message: "login successfully" });
     } catch (e) {
       console.error(e);
       res.status(400);
@@ -48,16 +55,18 @@ export class UserController {
 
   static async logout(req, res) {
     try {
-      res.status(200).cookie("token", '', {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      }).json({message: 'logout successfully'});
+      res
+        .status(200)
+        .cookie("token", "", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        })
+        .json({ message: "logout successfully" });
     } catch (e) {
       console.error(e);
       res.status(400).send();
     }
-    
   }
 
   static async getUser(req, res) {
@@ -83,9 +92,29 @@ export class UserController {
 
   static async setSelfPassword(req, res) {
     try {
+      const user = await UserModel.getPassword({ input: req.body.payload });
 
+      if (user.user_password === req.body.payload.user_password) {
+        await UserModel.setPassword({
+          input: {
+            user_password: req.body.user_password,
+            email_address: req.body.payload.email_address,
+          },
+        });
+        res
+          .status(200)
+          .cookie("token", "", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+          })
+          .json({ message: "Password was updated successfully" });
+      } else {
+        res.status(401).json({ code: "ER_WRONG_LOG" });
+      }
     } catch (e) {
-
+      console.error(e);
+      res.status(400).send();
     }
   }
 
@@ -101,15 +130,22 @@ export class UserController {
     try {
       const user = await UserModel.getUserEmail({ input: req.body.payload });
       console.log(user);
-      if(user.email_isValidated !== 1) {
-        const emailRes = await sendEmail({html: html, subject: 'Correo de autentificación',to: 'libonati.jonathan@gmail.com'} );
+      if (user.email_isValidated !== 1) {
+        const emailRes = await sendEmail({
+          html: html,
+          subject: "Correo de autentificación",
+          to: "libonati.jonathan@gmail.com",
+        });
         if (emailRes.isSent) {
-          res.status(200).json({...user, message: 'Email send'}).send();
+          res
+            .status(200)
+            .json({ ...user, message: "Email send" })
+            .send();
         } else {
-          res.status(400).json({code: 'ER_EMAIL_NO_SEND'}).send();
+          res.status(400).json({ code: "ER_EMAIL_NO_SEND" }).send();
         }
       } else {
-        res.status(400).json({code: 'ER_EMAIL_ALREADY_VALID'}).send();
+        res.status(400).json({ code: "ER_EMAIL_ALREADY_VALID" }).send();
       }
     } catch (e) {
       console.error(e);
@@ -118,7 +154,7 @@ export class UserController {
   }
 
   static async sendPasswordEmail(req, res) {
-    const html = (token) =>`
+    const html = (token) => `
         <h1>Valeriana</h1>
         <h1>Recupera tu contraseña</h1>
         <p>Haz clink en el siguiente link recuperar tu contraseña</p>
@@ -127,19 +163,25 @@ export class UserController {
     `;
 
     try {
-      console.log(req.body)
+      console.log(req.body);
       const payload = await UserModel.getPassword({ input: req.body });
       if (!payload) {
-        res.status(401).json({code: 'ER_WRONG_LOG'}).send()
+        res.status(401).json({ code: "ER_WRONG_LOG" }).send();
       } else {
         const secretKey = process.env.JWT_SECRET_KEY;
         const expiration = "1h"; // Token will expire in 1 hour
-        const token = jwt.sign(payload, secretKey, { expiresIn: expiration });
-        const emailRes = await sendEmail({html: html(token), subject: 'Correo de recuperación de contraseña', to: 'libonati.jonathan@gmail.com'} );
+        const token = jwt.sign({ ...payload, ...req.body }, secretKey, {
+          expiresIn: expiration,
+        });
+        const emailRes = await sendEmail({
+          html: html(token),
+          subject: "Correo de recuperación de contraseña",
+          to: "libonati.jonathan@gmail.com",
+        });
         if (emailRes.isSent) {
-          res.status(200).json({message: 'Email send'}).send();
+          res.status(200).json({ message: "Email send" }).send();
         } else {
-          res.status(400).json({code: 'ER_EMAIL_NO_SEND'}).send();
+          res.status(400).json({ code: "ER_EMAIL_NO_SEND" }).send();
         }
       }
     } catch (e) {
@@ -150,26 +192,25 @@ export class UserController {
 
   static async validateEmail(req, res) {
     try {
-      console.log(req.body)
+      console.log(req.body);
       if (req.body.payload.user_id === req.body.user_id) {
         const user = await UserModel.validateEmail({ input: req.body });
-        console.log(user)
+        console.log(user);
         if (user.email_isValidated === 1) {
           res.status(200).json(user);
         }
       } else {
-        res.status(498).json({code: 'ER_TOKEN_DENIED'})
+        res.status(498).json({ code: "ER_TOKEN_DENIED" });
       }
     } catch (e) {
       console.error(e);
       res.status(400);
     }
-    res.send()
+    res.send();
   }
 }
 
-const sendEmail = async ({html, subject, to}) => {
-
+const sendEmail = async ({ html, subject, to }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -188,10 +229,9 @@ const sendEmail = async ({html, subject, to}) => {
   try {
     const emailRes = await transporter.sendMail(mailOptions);
     console.log("Email sent: " + emailRes.response);
-    return {...emailRes, isSent: true};
+    return { ...emailRes, isSent: true };
   } catch (e) {
     console.error(e);
-    return {...e, isSent: false};
+    return { ...e, isSent: false };
   }
-
-}
+};

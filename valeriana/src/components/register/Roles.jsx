@@ -6,7 +6,7 @@ export const Roles = () => {
   const { handleOnChange } = useContext(UserContext);
 
   return (
-    <div className="text-gray-400">
+    <div className="text-secondary-base mt-4 mb-4">
       <p className="text-4xl pb-2">¿Que eres?</p>
       <RoleInput id={"role2"} text={"Doctor/a"} value={2} handleClick={handleOnChange}/>
       <RoleInput id={"role3"} text={"Paciente"} value={3} handleClick={handleOnChange}/>
