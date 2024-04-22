@@ -25,8 +25,10 @@ export const WelcomeDashboard = () => {
               Valeriana
             </h1>
           </div>
-          <div className="relative justify-self-center p-6 lg:p-16 m-4 mt-10 mb-6 lg:m-0 min-[490px]:mt-32 min-[490px]:mb-14 min-w-[240px] max-w-[400px] lg:max-w-none row-span-2  rounded-md lg:rounded-0 bg-tertiary-light">
-            <Outlet />
+          <div className="relative justify-self-center p-6 lg:p-16 mt-10 mb-6 lg:m-0 min-[490px]:mt-32 min-[490px]:mb-14 h-fit lg:h-full w-full min-w-[240px] max-w-[400px] lg:max-w-none row-span-2 lg:bg-tertiary-light rounded-md">
+            <div className="w-full p-4 lg:p-0 bg-tertiary-light lg:rounded-0">
+              <Outlet />
+            </div>
           </div>
           <div className="relative flex h-full p-10 justify-end content-end">
             <div className="relative lg:absolute bottom-0 h-fit lg:w-[480px] xl:w-[800px] 2xl:w-[1000px]">

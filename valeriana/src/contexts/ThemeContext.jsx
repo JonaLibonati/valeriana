@@ -11,6 +11,12 @@ export const ThemeProvider = ({ children }) => {
         else return 'lightRose' //default theme
     }
 );
+
+const useSetTheme = (theme) => {
+  setTheme(theme);
+  Cookies.setCookie('theme', theme);
+}
+
     // Themes for JS usage.
   const themeColors = {
     dark: {
@@ -53,7 +59,7 @@ export const ThemeProvider = ({ children }) => {
     <ThemeContext.Provider
       value={{
         theme,
-        setTheme,
+        useSetTheme,
         themeColors
       }}
     >

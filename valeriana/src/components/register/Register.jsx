@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
-import { Input } from "../globalComponents/input/Input";
-import { FilledButton } from "../globalComponents/Submit";
-import { UserContext } from "../../contexts/UserContext";
-import { Roles } from "./Roles";
-import { GoBackButton } from "../globalComponents/GoBackButton";
-import { RegisterHelpers } from "./registerHelpers";
-import { ErrorText, useErrorText } from "../globalComponents/ErrorText";
 import { Link } from "react-router-dom";
 import { Loading } from "../globalComponents/loading/Loading";
+import { Input } from "../globalComponents/input/Input";
+import { FilledButton } from "../globalComponents/Submit";
+import { GoBackButton } from "../globalComponents/GoBackButton";
+import { ErrorText, useErrorText } from "../globalComponents/ErrorText";
+import { UserContext } from "../../contexts/UserContext";
+import { RegisterHelpers } from "./registerHelpers";
+import { Roles } from "./Roles";
 
 export const Register = () => {
   const { userData, setUserData } = useContext(UserContext);
