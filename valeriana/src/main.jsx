@@ -14,6 +14,8 @@ import "./poppins.css";
 import "./sacramento.css";
 import "./index.css";
 import "./colorThemes.css";
+import { ConfigPage } from "./pages/ConfigPage";
+import { MydataPage } from "./pages/MydataPage";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,28 @@ const router = createBrowserRouter([
     path: "/app/user",
     element: <UserDashboard />,
     errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "home",
+        element: <></>,
+      },
+      {
+        path: "appointments",
+        element: <></>,
+      },
+      {
+        path: "patients",
+        element: <></>,
+      },
+      {
+        path: "mydata",
+        element: <MydataPage/>,
+      },
+      {
+        path: "config",
+        element: <ConfigPage />,
+      }
+    ]
   },
 ]);
 

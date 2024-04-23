@@ -1,8 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SelfUser } from '../../api/selfUser';
 import { ThemeSelector } from '../globalComponents/themeSelector/ThemeSelector';
+import { LogoutIcon } from '../globalComponents/icons/LogoutIcon';
+import { ButtonWithIcon } from '../globalComponents/buttons/ButtonWithIcon';
+import { ConfigIcon } from '../globalComponents/icons/ConfigIcon';
+import { PersonIcon } from '../globalComponents/icons/personIcon';
+import { Link, Outlet } from 'react-router-dom';
+import { LinkWithIcon } from '../globalComponents/buttons/LinkWithIcon';
 
 export const UserDashboard = () => {
+
+  const [firstName, setFirstName] = useState(undefined);
 
   useEffect(() => {
 
@@ -10,33 +18,47 @@ export const UserDashboard = () => {
       .then(({ res, body }) => {
         console.log(res)
         console.log(body)
+        setFirstName(body.first_name);
       })
       .catch(console.error)
 
   }, [])
 
+  const handleLogout = async () => {
+    await SelfUser.logout()
+  }
 
   return (
     <div className='grid grid-cols-[280px_minmax(0,1fr)] grid-rows-[40px_minmax(0,1fr)] h-dvh'>
       <div className='row-span-2 bg-tertiary-light'>
-        <div className='relative grid grid-rows-[fit-content(0)_1fr_40px] h-full p-4 text-tertiary-dark'>
+        <div className='relative grid grid-rows-[fit-content(0)_1fr_fit-content(0)] gap-2 h-full p-4 text-tertiary-dark'>
           <h1 className='sacramento text-[40px] text-tertiary-dark'>Valeriana</h1>
-          <div>holas</div>
+          <div className='text-xl'>
+            <Link to={'home'} className='block mb-2'>Inico</Link>
+            <Link to={'appointments'} className='block mb-2'>Agenda</Link>
+            <Link to={'patients'} className='block mb-2'>Pacientes</Link>
+          </div>
           <div className='mt-auto mb-auto'>
-            <button className='flex ' onClick={async () => await SelfUser.logout()}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="inline mr-2 size-7" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
-                <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
-              </svg>
-              <p className='pt-[1px] inline'>Cerrar sesión</p>
-            </button>
+            <LinkWithIcon className={'mt-2'} text={'Mis datos'} to={'./mydata'}>
+              <PersonIcon className={'inline mr-3 size-7'} />
+            </LinkWithIcon>
+            <LinkWithIcon className={'mt-2'} text={'Configuración'} to={'./config'}>
+              <ConfigIcon className={'inline mr-3 size-7'} />
+            </LinkWithIcon>
+            <ButtonWithIcon className={'mt-2 mb-2'} text={'Cerrar sesión'} onClick={() => handleLogout()}>
+              <LogoutIcon className={'inline mr-3 size-7'} />
+            </ButtonWithIcon>
           </div>
         </div>
       </div>
       <div className='bg-primary-light'>
-        <ThemeSelector />
+        <p className='ml-4 mt-4 text-lg text-secondary-base'>Hola <span className='text-primary-dark'>{firstName}</span> !</p>
       </div>
-      <div className='bg-primary-light text-tertiary-dark'></div>
+      <div className='bg-primary-light text-tertiary-dark'>
+        <div className='p-8'>
+          <Outlet />
+        </div>
+      </div>
     </div>
   )
 }

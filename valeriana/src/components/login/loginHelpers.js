@@ -22,7 +22,7 @@ export class LoginHelpers {
       console.log(body);
 
       if (res.status === 200) {
-        window.location.href = "/app/user";
+        window.location.href = "/app/user/home";
       } else {
         if (res.status === 401 && body.code === "ER_WRONG_LOG") {
           setErrorText("eMail o contraseña incorrectas");

@@ -19,7 +19,7 @@ export class SelfUser {
     if (res.status === 498 && body.code === 'ER_TOKEN_DENIED') {
       window.location.href = '/app/login';
     } else if (res.status === 400 && body.code === 'ER_EMAIL_ALREADY_VALID') {
-      window.location.href = '/app/user'; // GO TO USER HOME. To update later
+      window.location.href = '/app/user/home'; // GO TO USER HOME. To update later
     }
 
     return { res, body };

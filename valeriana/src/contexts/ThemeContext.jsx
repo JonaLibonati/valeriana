@@ -52,6 +52,11 @@ const useSetTheme = (theme) => {
       lightRose: "#fda4af",
       lightSky: "#7dd3fc",
       dark: "#292524",
+      border: {
+        lightRose: "#fb7185",
+        lightSky: "#38bdf8",
+        dark: "#57534e",
+      }
     }
   };
 
