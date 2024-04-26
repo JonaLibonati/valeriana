@@ -47,6 +47,57 @@ export class UserModel {
         return user[0];
     }
 
+    static async getUser ({ input }) {
+        const { user_id } = input;
+
+        const [user] = await connection.query (
+            `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        return user[0];
+    }
+
+    static async getUserName ({ input }) {
+
+        const { user_id } = input;
+
+        const [user] = await connection.query (
+            `SELECT user_name FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        return user[0];
+    }
+
+    static async getFirstName ({ input }) {
+        const { user_id } = input;
+
+        const [user] = await connection.query (
+            `SELECT first_name FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        return user[0];
+    }
+
+    static async getLastName ({ input }) {
+        const { user_id } = input;
+
+        const [user] = await connection.query (
+            `SELECT last_name FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        return user[0];
+    }
+
+    static async getUserEmail ({ input }) {
+        const { user_id } = input;
+
+        const [user] = await connection.query (
+            `SELECT email_address, email_isValidated FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        return user[0];
+    }
+
     static async getPassword ({ input }) {
 
         const { email_address } = input;
@@ -55,6 +106,50 @@ export class UserModel {
         );
 
         return user[0];
+    }
+
+    static async setUserName ({ input }) {
+
+        const { user_name, user_id } = input;
+
+        await connection.query(
+            'UPDATE users SET user_name = ? WHERE user_id = UUID_TO_BIN(?);', [user_name, user_id]
+        );
+
+        return this.getUserName({ input });
+    }
+
+    static async setFirstName ({ input }) {
+
+        const { first_name, user_id } = input;
+
+        await connection.query(
+            'UPDATE users SET first_name = ? WHERE user_id = UUID_TO_BIN(?);', [first_name, user_id]
+        );
+
+        return this.getFirstName({ input });
+    }
+
+    static async setLastName ({ input }) {
+
+        const { last_name, user_id } = input;
+
+        await connection.query(
+            'UPDATE users SET last_name = ? WHERE user_id = UUID_TO_BIN(?);', [last_name, user_id]
+        );
+
+        return this.getLastName({ input });
+    }
+
+    static async validateEmail ({ input }) {
+
+        const { user_id } = input;
+
+        await connection.query(
+            'UPDATE users SET email_isValidated = 1 WHERE user_id = UUID_TO_BIN(?);', [user_id]
+        );
+
+        return this.isEmailValidated({ input });
     }
 
     static async setPassword ({ input }) {
@@ -71,37 +166,6 @@ export class UserModel {
 
         const [user] = await connection.query(
             'SELECT email_isValidated FROM users WHERE user_id = UUID_TO_BIN(?)', [user_id]
-        );
-
-        return user[0];
-    }
-
-    static async validateEmail ({ input }) {
-
-        const { user_id } = input;
-
-        await connection.query(
-            'UPDATE users SET email_isValidated = 1 WHERE user_id = UUID_TO_BIN(?);', [user_id]
-        );
-
-        return this.isEmailValidated({ input });
-    }
-
-    static async getUser ({ input }) {
-        const { user_id } = input;
-
-        const [user] = await connection.query (
-            `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
-        );
-
-        return user[0];
-    }
-
-    static async getUserEmail ({ input }) {
-        const { user_id } = input;
-
-        const [user] = await connection.query (
-            `SELECT email_address, email_isValidated FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
         );
 
         return user[0];

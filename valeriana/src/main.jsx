@@ -16,6 +16,7 @@ import "./index.css";
 import "./colorThemes.css";
 import { ConfigPage } from "./pages/ConfigPage";
 import { MydataPage } from "./pages/MydataPage";
+import { ErrorProvider } from "./contexts/ErrorContext";
 
 const router = createBrowserRouter([
   {
@@ -64,7 +65,7 @@ const router = createBrowserRouter([
       },
       {
         path: "mydata",
-        element: <MydataPage/>,
+        element: <MydataPage />,
       },
       {
         path: "config",
@@ -77,7 +78,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider>
-      <RouterProvider router={router} />
+      <ErrorProvider>
+        <RouterProvider router={router} />
+      </ErrorProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

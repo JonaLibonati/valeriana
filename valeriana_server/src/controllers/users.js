@@ -157,7 +157,7 @@ export class UserController {
     const html = (token) => `
         <h1>Valeriana</h1>
         <h1>Recupera tu contraseña</h1>
-        <p>Haz clink en el siguiente link recuperar tu contraseña</p>
+        <p>Haz click en el siguiente link recuperar tu contraseña</p>
         <a href = 'http://localhost:5173/app/password/${token}' >http://localhost:5173/app/password/${token}</a>
         <p>Si no creaste un usuario nuevo con Valeriana por favor ignora este mail.</p>
     `;
@@ -188,6 +188,64 @@ export class UserController {
       console.error(e);
       res.status(400).send();
     }
+  }
+
+
+  static async setUserName(req, res) {
+    try {
+      console.log(req.body);
+      if (req.body.payload.user_id === req.body.user_id) {
+        const user = await UserModel.setUserName({ input: req.body });
+        console.log(user);
+        if (user.email_isValidated === 1) {
+          res.status(200).json(user);
+        }
+      } else {
+        res.status(498).json({ code: "ER_TOKEN_DENIED" });
+      }
+    } catch (e) {
+      console.error(e);
+      res.status(400);
+    }
+    res.send();
+  }
+
+  static async setFirstName(req, res) {
+    try {
+      console.log(req.body);
+      if (req.body.payload.user_id === req.body.user_id) {
+        const user = await UserModel.setFirstName({ input: req.body });
+        console.log(user);
+        if (user.email_isValidated === 1) {
+          res.status(200).json(user);
+        }
+      } else {
+        res.status(498).json({ code: "ER_TOKEN_DENIED" });
+      }
+    } catch (e) {
+      console.error(e);
+      res.status(400);
+    }
+    res.send();
+  }
+
+  static async setLastName(req, res) {
+    try {
+      console.log(req.body);
+      if (req.body.payload.user_id === req.body.user_id) {
+        const user = await UserModel.setLastName({ input: req.body });
+        console.log(user);
+        if (user.email_isValidated === 1) {
+          res.status(200).json(user);
+        }
+      } else {
+        res.status(498).json({ code: "ER_TOKEN_DENIED" });
+      }
+    } catch (e) {
+      console.error(e);
+      res.status(400);
+    }
+    res.send();
   }
 
   static async validateEmail(req, res) {

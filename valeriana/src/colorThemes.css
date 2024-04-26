@@ -11,12 +11,12 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-primary-dark: #7dd3fc;
-  --color-primary-base: #0ea5e9;
-  --color-primary-light: #292524;
-  --color-secondary-base: #a8a29e;
-  --color-secondary-light: #57534e;
-  --color-tertiary-dark: #e0f2fe;
-  --color-tertiary-light: #1c1917;
+    --color-primary-base: #0ea5e9;
+    --color-primary-light: #292524;
+    --color-secondary-base: #a8a29e;
+    --color-secondary-light: #57534e;
+    --color-tertiary-dark: #e0f2fe;
+    --color-tertiary-light: #1c1917;
   }
 }
 

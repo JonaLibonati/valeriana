@@ -1,32 +1,43 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
+import { SelfUser } from "../api/selfUser";
 
 export const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
-  // LoginData example
-  // {
-  //     user_email,
-  //     user_password
-  // }
 
-  const [userData, setUserData] = useState({});
+  const [userName, setUserName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
 
-  const handleOnChange = (e) => {
+  const role = useRef('');
+  const userData = useRef({});
 
-    const name = e.target.name;
-    const value = e.target.value;
-
-    setUserData((userElem) => ({ ...userElem, [name]: value }));
-
-    console.log(userData);
-  };
+  useEffect(() => {
+    SelfUser.getAll()
+      .then(({ body }) => {
+        userData.current = body;
+        setUserName(body.user_name);
+        setFirstName(body.first_name);
+        setLastName(body.last_name);
+        setEmail(body.email_address);
+        role.current = body.user_roleId
+      })
+      .catch(console.error)
+  }, [])
 
   return (
     <UserContext.Provider
       value={{
         userData,
-        setUserData,
-        handleOnChange,
+        userName,
+        setUserName,
+        firstName,
+        setFirstName,
+        lastName,
+        setLastName,
+        email,
+        setEmail
       }}
     >
       {children}

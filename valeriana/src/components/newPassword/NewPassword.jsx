@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Input } from "../globalComponents/input/Input";
-import { FilledButton } from "../globalComponents/Submit";
-import { NewPasswordHelpers } from "./newPasswordHelpers";
-import { ErrorText, useErrorText } from "../globalComponents/ErrorText";
+import { FilledButton } from "../globalComponents/buttons/FilledButton";
+import { NewPasswordHelpers } from "../../helpers/newPasswordHelpers";
 import { Loading } from "../globalComponents/loading/Loading";
+import { ErrorContext } from "../../contexts/ErrorContext";
 
 export const NewPassword = () => {
-  const { errorText, errorTrigger, errorSetter } = useErrorText();
+  const {setErrorText, setErrorPopUp} = useContext(ErrorContext);
 
   const [isPassUpdated, setIsPassUpdated] = useState(false);
 
@@ -16,9 +16,9 @@ export const NewPassword = () => {
   const { token } = useParams();
 
   const handleSubmit = async (e) => {
+    const setters = {setErrorText, setErrorPopUp, setIsLoading, setIsPassUpdated }
     await NewPasswordHelpers.handleSubmit(e, {
-      errorSetter,
-      setIsPassUpdated,
+      setters,
       token,
     });
   };
@@ -47,10 +47,9 @@ export const NewPassword = () => {
               type={"password"}
               placeholder={"Confirmar contraseña"}
             />
-            <ErrorText errorText={errorText} errorTrigger={errorTrigger} />
             <FilledButton>
               <Loading isLoading={isLoading} color={"bg-tertiary-light"}>
-                <input value="Enviar" type="submit" />
+                <input className="h-10 sm:text-lg" value="Enviar" type="submit" />
               </Loading>
             </FilledButton>
           </form>

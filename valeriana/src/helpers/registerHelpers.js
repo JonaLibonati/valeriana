@@ -1,15 +1,15 @@
-import { validateAllUser } from "../../schemes/userSchema";
-import { userCreate } from "../../api/userCreate";
+import { validateAllUser } from "../schemes/userSchema";
+import { userCreate } from "../api/userCreate";
 
 export class RegisterHelpers {
-  static async handleSubmit(e, { userData, setters }) {
+  static async handleSubmit(e, { roleId, setters }) {
     e.preventDefault();
 
-    const { setErrorText, setErrorTrigger, setIsLoading, setUserIsCreated } =
+    const { setErrorText, setErrorPopUp, setIsLoading, setUserIsCreated } =
       setters;
 
     let user = {
-      ...userData,
+      user_roleId: roleId  == "" ? undefined : roleId,
       first_name: e.target[0].value == "" ? undefined : e.target[0].value,
       last_name: e.target[1].value == "" ? undefined : e.target[1].value,
       user_name: e.target[2].value == "" ? undefined : e.target[2].value,
@@ -30,7 +30,7 @@ export class RegisterHelpers {
       message === "Required"
         ? setErrorText("Todos los campos son requeridos")
         : setErrorText(message);
-      setErrorTrigger((i) => i + 1);
+        setErrorPopUp(true);
       return;
     }
 
@@ -49,7 +49,7 @@ export class RegisterHelpers {
         } else {
           setErrorText("Ups! Algo a salido mal");
         }
-        setErrorTrigger((i) => i + 1);
+        setErrorPopUp(true);
       }
       setIsLoading(false);
     } catch {

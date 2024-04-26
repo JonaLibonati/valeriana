@@ -34,7 +34,7 @@ export class SelfUser {
       body: JSON.stringify({ user_id }),
     };
 
-    const res = await fetch("/v1/users/self/email", options);
+    const res = await fetch("/v1/users/self/validateEmail", options);
     const body = await res.json();
 
     if (res.status === 200 && body.email_isValidated === 1) {
