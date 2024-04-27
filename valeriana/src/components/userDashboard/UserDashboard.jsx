@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { SelfUser } from '../../api/selfUser';
-import { ThemeSelector } from '../globalComponents/themeSelector/ThemeSelector';
 import { LogoutIcon } from '../globalComponents/icons/LogoutIcon';
 import { ButtonWithIcon } from '../globalComponents/buttons/ButtonWithIcon';
 import { ConfigIcon } from '../globalComponents/icons/ConfigIcon';
-import { PersonIcon } from '../globalComponents/icons/personIcon';
+import { PersonIcon } from '../globalComponents/icons/PersonIcon';
 import { Link, Outlet } from 'react-router-dom';
 import { LinkWithIcon } from '../globalComponents/buttons/LinkWithIcon';
 

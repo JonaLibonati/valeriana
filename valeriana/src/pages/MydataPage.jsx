@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react'
-import { MydataModule } from '../components/mydata/MydataModule'
-import { NameModule } from '../components/mydata/NameModule'
-import { EmailModule } from '../components/mydata/EmailModule'
-import { PasswordModule } from '../components/mydata/PasswordModule'
-import { UserProvider } from '../contexts/UserContext'
-import { MyDataHelpers } from '../helpers/mydataHelpers'
-import { ErrorContext } from '../contexts/ErrorContext'
+import React, { useContext, useState } from 'react';
+import { MydataModule } from '../components/mydata/MydataModule';
+import { NameModule } from '../components/mydata/NameModule';
+import { EmailModule } from '../components/mydata/EmailModule';
+import { PasswordModule } from '../components/mydata/PasswordModule';
+import { UserProvider } from '../contexts/UserContext';
+import { MyDataHelpers } from '../helpers/myDataHelpers';
+import { ErrorContext } from '../contexts/ErrorContext';
 
 export const MydataPage = () => {
 
