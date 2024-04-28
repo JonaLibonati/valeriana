@@ -5,8 +5,8 @@ import image from "../../assets/images/valeriana.png";
 
 export const WelcomeDashboard = () => {
   return (
-    <div className="relative min-h-screen lg:h-dvh">
-      <div className="relative h-full bg-primary-light">
+    <div className="relative min-h-screen">
+      <div className="relative min-h-screen bg-primary-light">
         <svg
           className="absolute z-0 size-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@ export const WelcomeDashboard = () => {
             d="M 64 49 C 122 6 150 9 235 8 C 410 5 410 180 306 218 C 274 230 236 248 165 249 C 130 250 95 247 49 218 C -10 180 -10 110 64 49"
           />
         </svg>
-        <div className="relative z-100 grid grid-rows-3 lg:grid-cols-[minmax(600px,1fr)_minmax(300px,500px)] lg:grid-rows-[auto_minmax(0,1fr)] h-full content-between">
+        <div className="relative z-100 grid grid-rows-[fit-content(0), fit-content(0), fit-content(0)] grid-cols-1 lg:grid-cols-[minmax(600px,1fr)_minmax(300px,500px)] lg:grid-rows-[auto_minmax(0,1fr)] min-h-screen content-between">
           <div className="relative">
             <div className="m-10">
               <ThemeSelector />
@@ -26,7 +26,7 @@ export const WelcomeDashboard = () => {
             </h1>
           </div>
           <div className="relative justify-self-center p-6 lg:p-16 mt-10 mb-6 lg:m-0 min-[490px]:mt-32 min-[490px]:mb-14 h-fit lg:h-full w-full min-w-[240px] max-w-[400px] lg:max-w-none row-span-2 lg:bg-tertiary-light rounded-md">
-            <div className="w-full p-4 lg:p-0 bg-tertiary-light lg:rounded-0">
+            <div className="w-full p-4 lg:p-0 bg-tertiary-light rounded-md lg:rounded-0">
               <Outlet />
             </div>
           </div>

@@ -16,7 +16,7 @@ export const ErrorProvider = ({ children }) => {
         setErrorText
       }}
     >
-      { errorPopUp?  <ErrorPopUp errorMessage={errorText} setErrorPopUp={setErrorPopUp} /> : <></>}
+      { errorPopUp?  <ErrorPopUp message={errorText} setPopUp={setErrorPopUp} /> : <></>}
       {children}
     </ErrorContext.Provider>
   );
