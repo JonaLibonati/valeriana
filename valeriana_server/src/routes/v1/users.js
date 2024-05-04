@@ -12,9 +12,10 @@ usersRouter.post ('/', UserMiddelwares.validateUserInput, UserMiddelwares.hashPa
 usersRouter.delete ('/', UserController.deleteById)
 
 usersRouter.get ('/self', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.getSelfUser)
-usersRouter.patch ('/self/userName', TokenMiddleware.validate, UserController.setUserName)
-usersRouter.patch ('/self/firstName', TokenMiddleware.validate, UserController.setFirstName)
-usersRouter.patch ('/self/lastName', TokenMiddleware.validate, UserController.setLastName)
+usersRouter.patch ('/self/userName', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.setUserName)
+usersRouter.patch ('/self/firstName', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.setFirstName)
+usersRouter.patch ('/self/lastName', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.setLastName)
+usersRouter.patch ('/self/email', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserMiddelwares.checkPasswordById, UserController.setEmail)
 usersRouter.patch ('/self/validateEmail', TokenMiddleware.validate, UserController.validateEmail)
 usersRouter.patch ('/self/password', TokenMiddleware.validateOldPassword, UserMiddelwares.validatePasswordInput, UserMiddelwares.hashPassword, UserController.setSelfPassword)
 

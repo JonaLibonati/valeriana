@@ -10,18 +10,27 @@ export const UserProvider = ({ children }) => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
 
-  const role = useRef('');
   const userData = useRef({});
+  const role = useRef('');
+
+  const user = {
+    data : userData,
+    role,
+    setUserName,
+    setFirstName,
+    setLastName,
+    setEmail
+  }
 
   useEffect(() => {
     SelfUser.getAll()
       .then(({ body }) => {
-        userData.current = body;
-        setUserName(body.user_name);
-        setFirstName(body.first_name);
-        setLastName(body.last_name);
-        setEmail(body.email_address);
-        role.current = body.user_roleId
+        user.setUserName(body.user_name);
+        user.setFirstName(body.first_name);
+        user.setLastName(body.last_name);
+        user.setEmail(body.email_address);
+        user.data.current = body;
+        user.role.current = body.user_roleId;
       })
       .catch(console.error)
   }, [])
@@ -29,15 +38,11 @@ export const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        userData,
         userName,
-        setUserName,
         firstName,
-        setFirstName,
         lastName,
-        setLastName,
         email,
-        setEmail
+        user
       }}
     >
       {children}

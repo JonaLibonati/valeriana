@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { SelfUser } from '../../api/selfUser';
 import { LogoutIcon } from '../globalComponents/icons/LogoutIcon';
 import { ButtonWithIcon } from '../globalComponents/buttons/ButtonWithIcon';
@@ -6,22 +6,11 @@ import { ConfigIcon } from '../globalComponents/icons/ConfigIcon';
 import { PersonIcon } from '../globalComponents/icons/PersonIcon';
 import { Link, Outlet } from 'react-router-dom';
 import { LinkWithIcon } from '../globalComponents/buttons/LinkWithIcon';
+import { UserContext } from '../../contexts/UserContext';
 
 export const UserDashboard = () => {
 
-  const [firstName, setFirstName] = useState(undefined);
-
-  useEffect(() => {
-
-    SelfUser.getAll()
-      .then(({ res, body }) => {
-        console.log(res)
-        console.log(body)
-        setFirstName(body.first_name);
-      })
-      .catch(console.error)
-
-  }, [])
+  const { firstName } = useContext(UserContext);
 
   const handleLogout = async () => {
     await SelfUser.logout()

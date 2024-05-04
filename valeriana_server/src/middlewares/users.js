@@ -21,6 +21,25 @@ export class UserMiddelwares {
     }
   }
 
+  static async checkPasswordById(req, res, next) {
+    try {
+      const user = await UserModel.getPasswordById({ input: req.body.payload });
+      console.log(user);
+      if (!user) res.status(401).json({ code: "ER_WRONG_LOG" }).end();
+      else {
+        const user_checked = await bcrypt.compare(
+          req.body.user_password,
+          user.user_password
+        );
+        if (!user_checked) res.status(401).json({ code: "ER_WRONG_LOG" }).end();
+        else next();
+      }
+    } catch {
+      console.error;
+      res.status(401).json({ code: "ER_WRONG_LOG" }).end();
+    }
+  }
+
   static async hashPassword(req, res, next) {
     const saltRounds = 10;
 

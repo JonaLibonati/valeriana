@@ -1,23 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react';
 import { EditInput } from './EditInput';
-import { FilledButton } from '../globalComponents/buttons/FilledButton';
 import { UserContext } from '../../contexts/UserContext';
-import { UserHelpers } from '../../helpers/userHelpers';
 import { MydataRow } from './MydataRow';
+import { MyDataSaveButton } from './MyDataSaveButton';
 
-export const NameModule = () => {
+export const NameModule = ({ isLoading }) => {
 
   const { userData, userName, firstName, lastName, setUserName, setFirstName, setLastName } = useContext(UserContext);
 
   const [hasChanged, setHasChanged] = useState(false);
 
-  const { user_name, first_name, last_name } = userData.current;
+  const { user_name, first_name, last_name } = userData;
 
   useEffect(() => {
     if (userName !== user_name || firstName !== first_name || lastName !== last_name) {
       setHasChanged(true);
     } else setHasChanged(false);
-  }, [userName, firstName, lastName])
+  }, [userName, firstName, lastName, userData])
 
   return (
     <>
@@ -33,11 +32,7 @@ export const NameModule = () => {
       {
         hasChanged ?
           <>
-            <div className='col-span-2'>
-              <FilledButton>
-                <input className='text-md' value="Guardar" type="submit" />
-              </FilledButton>
-            </div>
+            <MyDataSaveButton isLoading={isLoading} />
           </> :
           <></>
       }

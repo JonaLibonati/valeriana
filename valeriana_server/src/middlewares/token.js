@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 
 export class TokenMiddleware {
+
   static async validate(req, res, next) {
+
+    console.log('validating token')
 
     const token = validateToken(req.cookies.token);
 

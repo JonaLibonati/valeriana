@@ -5,7 +5,7 @@ export class NewPasswordHelpers {
   static async handleSubmit(e, { token, setters }) {
     e.preventDefault();
 
-    const { setErrorText, setErrorPopUp, setIsPassUpdated, setIsLoading } = setters;
+    const { usePopUp, setIsPassUpdated, setIsLoading } = setters;
 
     const userData = {
       user_password: e.target[0].value == "" ? undefined : e.target[0].value,
@@ -22,16 +22,14 @@ export class NewPasswordHelpers {
 
       user.error.issues.map((e) => {
         if (e.code == "custom") {
-          setErrorText("Las contraseñas no son iguales");
-          setErrorPopUp(true);
+          usePopUp("Las contraseñas no son iguales.", "error");
           arePassEqual = false;
         }
       });
 
       arePassEqual
-        ? setErrorText("Se requieren ambos campos")
-        : setErrorText("Las contraseñas no son iguales");
-      setErrorPopUp(true);
+        ? usePopUp("Se requieren ambos campos.", "error")
+        : usePopUp("Las contraseñas no son iguales.", "error");
       return;
     }
 
@@ -43,11 +41,9 @@ export class NewPasswordHelpers {
       if (res.status === 200) {
         setIsPassUpdated(true);
       } else if (res.status === 401 && body.code === "ER_WRONG_LOG") {
-        setErrorText("Token no es valido o ha vencido.");
-        setErrorPopUp(true);
+        usePopUp("Token no es valido o ha vencido.", "error");
       } else {
-        setErrorText("Ups! Algo a salido mal");
-        setErrorPopUp(true);
+        usePopUp("Ups! Algo a salido mal.", "error");
       }
       console.log(res);
       console.log(body);
@@ -59,7 +55,7 @@ export class NewPasswordHelpers {
 
   static async handleSendPasswordEmail(e, { emailElem, setters }) {
 
-    const { setErrorText, setErrorPopUp, setIsLoading, setNewPassIsSent } = setters;
+    const { usePopUp, setIsLoading, setNewPassIsSent } = setters;
 
     const userData = {
       email_address:
@@ -78,11 +74,10 @@ export class NewPasswordHelpers {
         console.log(res);
       } else {
         if (res.status === 401 && body.code === "ER_WRONG_LOG") {
-          setErrorText("La cuenta no existe.");
+          usePopUp("La cuenta no existe.", "error");
         } else {
-          setErrorText("Ups! Algo a salido mal");
+          usePopUp("Ups! Algo a salido mal.", "error");
         }
-        setErrorPopUp(true);
       }
     } catch (e) {
       console.error(e);

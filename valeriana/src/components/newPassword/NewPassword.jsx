@@ -4,10 +4,10 @@ import { Input } from "../globalComponents/input/Input";
 import { FilledButton } from "../globalComponents/buttons/FilledButton";
 import { NewPasswordHelpers } from "../../helpers/newPasswordHelpers";
 import { Loading } from "../globalComponents/loading/Loading";
-import { ErrorContext } from "../../contexts/ErrorContext";
+import { PopUpContext } from "../../contexts/PopUpContext";
 
 export const NewPassword = () => {
-  const {setErrorText, setErrorPopUp} = useContext(ErrorContext);
+  const {usePopUp} = useContext(PopUpContext);
 
   const [isPassUpdated, setIsPassUpdated] = useState(false);
 
@@ -16,7 +16,7 @@ export const NewPassword = () => {
   const { token } = useParams();
 
   const handleSubmit = async (e) => {
-    const setters = {setErrorText, setErrorPopUp, setIsLoading, setIsPassUpdated }
+    const setters = {usePopUp, setIsLoading, setIsPassUpdated }
     await NewPasswordHelpers.handleSubmit(e, {
       setters,
       token,

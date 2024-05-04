@@ -4,15 +4,15 @@ import { Input } from "../globalComponents/input/Input";
 import { FilledButton } from "../globalComponents/buttons/FilledButton";
 import { GoBackButton } from "../globalComponents/GoBackButton";
 import { RegisterHelpers } from "../../helpers/registerHelpers";
-import { ErrorContext } from "../../contexts/ErrorContext";
+import { PopUpContext } from "../../contexts/PopUpContext";
 
 export const RegisterForm = ({ roleId, setRoleId, setUserIsCreated }) => {
-  const { setErrorText, setErrorPopUp } = useContext(ErrorContext);
+  const { usePopUp } = useContext(PopUpContext);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e) => {
-    const setters = { setErrorText, setErrorPopUp, setIsLoading, setUserIsCreated };
+    const setters = { usePopUp, setIsLoading, setUserIsCreated };
     RegisterHelpers.handleSubmit(e, {
       roleId,
       setters

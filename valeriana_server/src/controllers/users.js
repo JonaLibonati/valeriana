@@ -128,7 +128,7 @@ export class UserController {
     `;
 
     try {
-      const user = await UserModel.getUserEmail({ input: req.body.payload });
+      const user = await UserModel.getEmail({ input: req.body.payload });
       console.log(user);
       if (user.email_isValidated !== 1) {
         const emailRes = await sendEmail({
@@ -190,19 +190,15 @@ export class UserController {
     }
   }
 
-
   static async setUserName(req, res) {
     try {
-      console.log(req.body);
-      if (req.body.payload.user_id === req.body.user_id) {
-        const user = await UserModel.setUserName({ input: req.body });
-        console.log(user);
-        if (user.email_isValidated === 1) {
-          res.status(200).json(user);
-        }
-      } else {
-        res.status(498).json({ code: "ER_TOKEN_DENIED" });
-      }
+      const input = {
+        user_name: req.body.user_name,
+        user_id: req.body.payload.user_id,
+      };
+      const user = await UserModel.setUserName({ input });
+      console.log(user);
+      res.status(200).json(user);
     } catch (e) {
       console.error(e);
       res.status(400);
@@ -212,16 +208,13 @@ export class UserController {
 
   static async setFirstName(req, res) {
     try {
-      console.log(req.body);
-      if (req.body.payload.user_id === req.body.user_id) {
-        const user = await UserModel.setFirstName({ input: req.body });
-        console.log(user);
-        if (user.email_isValidated === 1) {
-          res.status(200).json(user);
-        }
-      } else {
-        res.status(498).json({ code: "ER_TOKEN_DENIED" });
-      }
+      const input = {
+        first_name: req.body.first_name,
+        user_id: req.body.payload.user_id,
+      };
+      const user = await UserModel.setFirstName({ input });
+      console.log(user);
+      res.status(200).json(user);
     } catch (e) {
       console.error(e);
       res.status(400);
@@ -231,16 +224,29 @@ export class UserController {
 
   static async setLastName(req, res) {
     try {
-      console.log(req.body);
-      if (req.body.payload.user_id === req.body.user_id) {
-        const user = await UserModel.setLastName({ input: req.body });
-        console.log(user);
-        if (user.email_isValidated === 1) {
-          res.status(200).json(user);
-        }
-      } else {
-        res.status(498).json({ code: "ER_TOKEN_DENIED" });
-      }
+      const input = {
+        last_name: req.body.last_name,
+        user_id: req.body.payload.user_id,
+      };
+      const user = await UserModel.setLastName({ input });
+      console.log(user);
+      res.status(200).json(user);
+    } catch (e) {
+      console.error(e);
+      res.status(400);
+    }
+    res.send();
+  }
+
+  static async setEmail(req, res) {
+    try {
+      const input = {
+        email_address: req.body.email_address,
+        user_id: req.body.payload.user_id,
+      };
+      const user = await UserModel.setEmail({ input });
+      console.log(user);
+      res.status(200).json(user);
     } catch (e) {
       console.error(e);
       res.status(400);
@@ -254,9 +260,7 @@ export class UserController {
       if (req.body.payload.user_id === req.body.user_id) {
         const user = await UserModel.validateEmail({ input: req.body });
         console.log(user);
-        if (user.email_isValidated === 1) {
-          res.status(200).json(user);
-        }
+        res.status(200).json(user);
       } else {
         res.status(498).json({ code: "ER_TOKEN_DENIED" });
       }

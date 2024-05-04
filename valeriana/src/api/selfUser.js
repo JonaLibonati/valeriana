@@ -3,11 +3,7 @@ export class SelfUser {
   static async getAll() {
     const res = await fetch("/v1/users/self");
     const body = await res.json();
-    if (res.status === 498 && body.code === 'ER_TOKEN_DENIED') {
-      window.location.href = '/app/login';
-    } else if (res.status === 401 && body.code === 'ER_EMAIL_NO_VALIDATED') {
-      window.location.href = '/app/validate';
-    }
+    redirect(res, body);
 
     return { res, body };
   }
@@ -25,6 +21,66 @@ export class SelfUser {
     return { res, body };
   }
 
+  static async setUserName({ user_name }) {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_name }),
+    };
+    const res = await fetch("/v1/users/self/userName", options);
+    const body = await res.json();
+    redirect(res, body);
+
+    return { res, body };
+  }
+
+  static async setFirstName({ first_name }) {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ first_name }),
+    };
+    const res = await fetch("/v1/users/self/firstName", options);
+    const body = await res.json();
+    redirect(res, body);
+
+    return { res, body };
+  }
+
+  static async setLastName({ last_name }) {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ last_name }),
+    };
+    const res = await fetch("/v1/users/self/lastName", options);
+    const body = await res.json();
+    redirect(res, body);
+
+    return { res, body };
+  }
+
+  static async setEmail({ email_address, user_password }) {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email_address, user_password }),
+    };
+    const res = await fetch("/v1/users/self/email", options);
+    const body = await res.json();
+    redirect(res, body);
+
+    return { res, body };
+  }
+
   static async validateEmail({ user_id }) {
     const options = {
       method: "PATCH",
@@ -37,11 +93,7 @@ export class SelfUser {
     const res = await fetch("/v1/users/self/validateEmail", options);
     const body = await res.json();
 
-    if (res.status === 200 && body.email_isValidated === 1) {
-      window.location.href = '/app/user'; // GO TO USER HOME. To update later
-    } else if (res.status === 498 && body.code === 'ER_TOKEN_DENIED') {
-      window.location.href = '/app/login';
-    }
+    redirect(res, body);
 
     return { res, body };
   }
@@ -55,5 +107,13 @@ export class SelfUser {
     }
 
     return { res, body };
+  }
+}
+
+const redirect = (res, body) => {
+  if (res.status === 498 && body.code === 'ER_TOKEN_DENIED') {
+    window.location.href = '/app/login';
+  } else if (res.status === 401 && body.code === 'ER_EMAIL_NO_VALIDATED') {
+    window.location.href = '/app/validate';
   }
 }

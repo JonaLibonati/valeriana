@@ -3,20 +3,20 @@ import { Input } from "../globalComponents/input/Input";
 import { LoginHelpers } from "../../helpers/loginHelpers";
 import { Loading } from "../globalComponents/loading/Loading";
 import { FilledButton } from "../globalComponents/buttons/FilledButton";
-import { ErrorContext } from "../../contexts/ErrorContext";
+import { PopUpContext } from "../../contexts/PopUpContext";
 import { NewPassOption } from "./NewPassOption";
 import { NewUserOption } from "./NewUserOption";
 
 export const LoginForm = ({ setNewPassIsSent, setNewPassEmail }) => {
   const emailElem = useRef(null);
 
-  const { setErrorText, setErrorPopUp } = useContext(ErrorContext);
+  const { usePopUp } = useContext(PopUpContext);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e) => {
-    const setters = { setErrorText, setErrorPopUp, setIsLoading };
-    LoginHelpers.handleSubmit(e, { setters });
+    const setters = { usePopUp, setIsLoading };
+    LoginHelpers.handleSubmit(e, {setters});
   };
 
   return (

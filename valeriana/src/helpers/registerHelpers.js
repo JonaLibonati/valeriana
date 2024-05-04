@@ -5,7 +5,7 @@ export class RegisterHelpers {
   static async handleSubmit(e, { roleId, setters }) {
     e.preventDefault();
 
-    const { setErrorText, setErrorPopUp, setIsLoading, setUserIsCreated } =
+    const { usePopUp, setIsLoading, setUserIsCreated } =
       setters;
 
     let user = {
@@ -28,9 +28,8 @@ export class RegisterHelpers {
       const message = user.error.issues[0].message;
 
       message === "Required"
-        ? setErrorText("Todos los campos son requeridos")
-        : setErrorText(message);
-        setErrorPopUp(true);
+        ? usePopUp("Todos los campos son requeridos", "error")
+        : usePopUp(message, "error");
       return;
     }
 
@@ -43,13 +42,12 @@ export class RegisterHelpers {
         setUserIsCreated(true);
       } else {
         if (res.status === 400 && body.code === "ER_DUP_ENTRY_USER_NAME") {
-          setErrorText("El nombre de usuario ya esta en uso");
+          usePopUp("El nombre de usuario ya esta en uso", "error");
         } else if (res.status === 400 && body.code === "ER_DUP_ENTRY_EMAIL") {
-          setErrorText("El email ya esta en uso");
+          usePopUp("El email ya esta en uso", "error");
         } else {
-          setErrorText("Ups! Algo a salido mal");
+          usePopUp("Ups! Algo a salido mal", "error");
         }
-        setErrorPopUp(true);
       }
       setIsLoading(false);
     } catch {

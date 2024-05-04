@@ -16,7 +16,8 @@ import "./index.css";
 import "./colorThemes.css";
 import { ConfigPage } from "./pages/ConfigPage";
 import { MydataPage } from "./pages/MydataPage";
-import { ErrorProvider } from "./contexts/ErrorContext";
+import { PopUpProvider } from "./contexts/PopUpContext";
+import { UserProvider } from "./contexts/UserContext";
 
 const router = createBrowserRouter([
   {
@@ -48,7 +49,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/app/user",
-    element: <UserDashboard />,
+    element: <UserProvider><UserDashboard /></UserProvider>,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -78,9 +79,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider>
-      <ErrorProvider>
+      <PopUpProvider>
         <RouterProvider router={router} />
-      </ErrorProvider>
+      </PopUpProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

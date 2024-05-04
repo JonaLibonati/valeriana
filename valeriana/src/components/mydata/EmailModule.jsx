@@ -1,21 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { EditInput } from './EditInput';
-import { FilledButton } from '../globalComponents/buttons/FilledButton';
 import { UserContext } from '../../contexts/UserContext';
+import { MyDataSaveButton } from './MyDataSaveButton';
 
-export const EmailModule = () => {
+export const EmailModule = ({ isLoading }) => {
 
   const { userData, email, setEmail } = useContext(UserContext);
 
   const [hasChanged, setHasChanged] = useState(false);
 
-  const { email_address } = userData.current;
+  const { email_address } = userData;
 
   useEffect(() => {
     if (email !== email_address) {
       setHasChanged(true);
     } else setHasChanged(false);
-  }, [email])
+  }, [email, userData])
 
   return (
     <>
@@ -28,13 +28,9 @@ export const EmailModule = () => {
           <>
             <div className="inline text-secondary-base border-r-2 border-secondary-base">Contraseña</div>
             <div className="inline relative ml-2">
-              <EditInput type={'password'} />
+              <EditInput type={'password'} setValue={() => {}} />
             </div>
-            <div className='col-span-2'>
-              <FilledButton>
-                <input className='text-md' value="Guardar" type="submit" />
-              </FilledButton>
-            </div>
+            <MyDataSaveButton isLoading={isLoading} />
           </> :
           <></>
       }

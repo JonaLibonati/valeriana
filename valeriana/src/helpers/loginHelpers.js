@@ -4,7 +4,7 @@ export class LoginHelpers {
   static async handleSubmit(e, { setters }) {
     e.preventDefault();
 
-    const { setErrorText, setErrorPopUp, setIsLoading } = setters;
+    const { usePopUp, setIsLoading } = setters;
 
     const userData = {
       email_address: e.target[0].value == "" ? undefined : e.target[0].value,
@@ -24,11 +24,10 @@ export class LoginHelpers {
         window.location.href = "/app/user/home";
       } else {
         if (res.status === 401 && body.code === "ER_WRONG_LOG") {
-          setErrorText("eMail o contraseña incorrectas");
+          usePopUp("eMail o contraseña incorrectas", "error");
         } else {
-          setErrorText("Ups! Algo a salido mal");
+          usePopUp("Ups! Algo a salido mal", "error");
         }
-        setErrorPopUp(true);
       }
     } catch (e) {
       console.error(e);

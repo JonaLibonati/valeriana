@@ -88,7 +88,7 @@ export class UserModel {
         return user[0];
     }
 
-    static async getUserEmail ({ input }) {
+    static async getEmail ({ input }) {
         const { user_id } = input;
 
         const [user] = await connection.query (
@@ -103,6 +103,16 @@ export class UserModel {
         const { email_address } = input;
         const [user] = await connection.query(
             'SELECT user_password FROM users WHERE email_address = ?', [email_address]
+        );
+
+        return user[0];
+    }
+
+    static async getPasswordById ({ input }) {
+
+        const { user_id } = input;
+        const [user] = await connection.query(
+            'SELECT user_password FROM users WHERE user_id = UUID_TO_BIN(?)', [user_id]
         );
 
         return user[0];
@@ -139,6 +149,17 @@ export class UserModel {
         );
 
         return this.getLastName({ input });
+    }
+
+    static async setEmail ({ input }) {
+
+        const { email_address, user_id } = input;
+
+        await connection.query(
+            'UPDATE users SET email_address = ? WHERE user_id = UUID_TO_BIN(?);', [email_address, user_id]
+        );
+
+        return this.getEmail({ input });
     }
 
     static async validateEmail ({ input }) {
