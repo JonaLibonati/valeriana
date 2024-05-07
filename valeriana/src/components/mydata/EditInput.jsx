@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { EditIcon } from '../globalComponents/icons/EditIcon'
 
 export const EditInput = ({ value, setValue, type, maxLength }) => {

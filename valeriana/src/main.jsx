@@ -18,6 +18,8 @@ import { ConfigPage } from "./pages/ConfigPage";
 import { MydataPage } from "./pages/MydataPage";
 import { PopUpProvider } from "./contexts/PopUpContext";
 import { UserProvider } from "./contexts/UserContext";
+import { TimeProvider } from "./contexts/TimeContext";
+import { HomePage } from "./pages/HomePage";
 
 const router = createBrowserRouter([
   {
@@ -49,12 +51,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/app/user",
-    element: <UserProvider><UserDashboard /></UserProvider>,
+    element: <TimeProvider><UserProvider><UserDashboard /></UserProvider></TimeProvider>,
     errorElement: <ErrorPage />,
     children: [
       {
         path: "home",
-        element: <></>,
+        element: <HomePage/>,
       },
       {
         path: "appointments",

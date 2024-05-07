@@ -3,42 +3,6 @@ import { createContext, useRef, useState, useEffect } from "react";
 
 export const DateContext = createContext(null);
 
-const monthNames=[
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"]; // array of month names
-const monthAbbr=[
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"]; // array of month Abbreviation
-const dayNames=[
-    "Domingo",
-    "Lunes",
-    "Martes",
-    "Miercoles",
-    "Jueves",
-    "Viernes",
-    "Sabado"]; // array of day names
-const dayAbbr=['D', 'L', 'M', 'M', 'J', 'V', 'S']; // array of day Abbreviation
-
 export const DateProvider = ({children}) => {
 
     const selectedDate = useRef(new Date()); // creates a new date object with the current date and time

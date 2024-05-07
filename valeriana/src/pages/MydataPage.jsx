@@ -1,30 +1,39 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
+import { UserContext } from '../contexts/UserContext';
+import { MydataSection } from '../components/mydata/MydataSection';
 import { MydataModule } from '../components/mydata/MydataModule';
-import { NameModule } from '../components/mydata/NameModule';
+import { UserNameModule } from '../components/mydata/UserNameModule';
 import { EmailModule } from '../components/mydata/EmailModule';
 import { PasswordModule } from '../components/mydata/PasswordModule';
-import { UserProvider } from '../contexts/UserContext';
-import { MyDataHelpers } from '../helpers/myDataHelpers';
+import { FirstNameModule } from '../components/mydata/FirstNameModule';
+import { LastNameModule } from '../components/mydata/LastNameModule';
 
 
 export const MydataPage = () => {
 
-  const [isLoadingNameModule, setIsLoadingNameModule] = useState(false);
-  const [isLoadingEmailModule, setIsLoadingEmailModule] = useState(false);
+  const { UserHelpers } = useContext(UserContext)
 
   return (
-    <UserProvider>
-      <div className='grid grid-rows-[repeat(3,fit-content(0))] gap-3'>
-        <MydataModule handleSubmit={MyDataHelpers.handleNameModule} setIsLoading={setIsLoadingNameModule}>
-          <NameModule isLoading={isLoadingNameModule}/>
+    <div className='grid grid-rows-[repeat(3,fit-content(0))] gap-3'>
+      <MydataSection>
+        <MydataModule handleSubmit={UserHelpers.handleNewUserName} >
+          <UserNameModule />
         </MydataModule>
-        <MydataModule handleSubmit={MyDataHelpers.handleEmailModule} setIsLoading={setIsLoadingEmailModule}>
-          <EmailModule isLoading={isLoadingEmailModule}/>
+        <MydataModule handleSubmit={UserHelpers.handleNewFirstName} >
+          <FirstNameModule />
         </MydataModule>
-        <div className="p-8 rounded-md bg-tertiary-light">
-          <PasswordModule />
-        </div>
-      </div>
-    </UserProvider>
+        <MydataModule handleSubmit={UserHelpers.handleNewLastName} >
+          <LastNameModule />
+        </MydataModule>
+      </MydataSection>
+      <MydataSection>
+        <MydataModule handleSubmit={UserHelpers.handleNewEmail} >
+          <EmailModule />
+        </MydataModule>
+      </MydataSection>
+      <MydataSection>
+        <PasswordModule />
+      </MydataSection>
+    </div>
   )
 }
