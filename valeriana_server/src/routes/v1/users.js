@@ -11,6 +11,10 @@ usersRouter.post ('/', UserMiddelwares.validateUserInput, UserMiddelwares.hashPa
 
 usersRouter.delete ('/', UserController.deleteById)
 
+usersRouter.get ('/search', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.searchUser);
+usersRouter.get ('/search/doctor', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.searchDoctor);
+usersRouter.get ('/search/psychologist', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.searchPsychologist);
+
 usersRouter.get ('/self', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.getSelfUser)
 usersRouter.patch ('/self/userName', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.setUserName)
 usersRouter.patch ('/self/firstName', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, UserController.setFirstName)

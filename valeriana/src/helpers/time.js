@@ -14,8 +14,6 @@ export const updateTime = ({ setDate, setDay, setMonth, setHours, setMinutes }) 
   setHours(`${hours.toString().padStart(2, '0')}`);
   setMinutes(`${minutes.toString().padStart(2, '0')}`);
 
-  console.log(date)
-
   // Set a timeout for one minute
   setTimeout(updateTime, 60000, { setDate, setDay, setMonth, setHours, setMinutes });
 }

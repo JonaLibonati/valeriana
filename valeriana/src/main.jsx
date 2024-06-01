@@ -20,6 +20,9 @@ import { PopUpProvider } from "./contexts/PopUpContext";
 import { UserProvider } from "./contexts/UserContext";
 import { TimeProvider } from "./contexts/TimeContext";
 import { HomePage } from "./pages/HomePage";
+import { PsychologistPage } from "./pages/PsychologistPage";
+import { PatientsPage } from "./pages/PatientsPage";
+import { PsychologistProvider } from "./contexts/PsychologistContext";
 
 const router = createBrowserRouter([
   {
@@ -55,8 +58,12 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "home",
+        path: "",
         element: <HomePage/>,
+      },
+      {
+        path: "home",
+        element: <PsychologistProvider><HomePage/></PsychologistProvider>,
       },
       {
         path: "appointments",
@@ -64,7 +71,11 @@ const router = createBrowserRouter([
       },
       {
         path: "patients",
-        element: <></>,
+        element: <PatientsPage />,
+      },
+      {
+        path: "psychologist",
+        element: <PsychologistProvider><PsychologistPage /></PsychologistProvider>,
       },
       {
         path: "mydata",

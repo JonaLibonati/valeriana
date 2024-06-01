@@ -37,6 +37,20 @@ export const validateAllUser = (object) => {
     return user.safeParse(object);
 }
 
+export const validateFirstName = (object) => {
+    let user = userSchema.required({
+        first_name: true,
+    });
+    return user.safeParse(object);
+}
+
+export const validateLastName = (object) => {
+    let user = userSchema.required({
+        last_name: true,
+    });
+    return user.safeParse(object);
+}
+
 export const validateName = (object) => {
     let user = userSchema.required({
         first_name: true,

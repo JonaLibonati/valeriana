@@ -69,6 +69,39 @@ export class UserController {
     }
   }
 
+  static async searchUser(req, res) {
+    try {
+      const users = await UserModel.searchUser({ input: req.query.value });
+      console.log(users)
+      res.status(200).json({users: users});
+    } catch (e) {
+      console.error(e);
+      res.status(400).send();
+    }
+  }
+
+  static async searchDoctor(req, res) {
+    try {
+      const users = await UserModel.searchDoctor({ input: req.query.value });
+      console.log(users)
+      res.status(200).json({users: users});
+    } catch (e) {
+      console.error(e);
+      res.status(400).send();
+    }
+  }
+
+  static async searchPsychologist(req, res) {
+    try {
+      const users = await UserModel.searchPsychologist({ input: req.query.value });
+      console.log(users)
+      res.status(200).json({users: users});
+    } catch (e) {
+      console.error(e);
+      res.status(400).send();
+    }
+  }
+
   static async getUser(req, res) {
     try {
       const user = await UserModel.getUser({ input: req.body });

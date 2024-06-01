@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { EditInput } from './EditInput';
-import { UserContext } from '../../contexts/UserContext';
-import { MyDataSaveButton } from './MyDataSaveButton';
+import React, { useContext, useEffect, useState } from "react";
+import { EditInput } from "./EditInput";
+import { UserContext } from "../../contexts/UserContext";
+import { MyDataSaveButton } from "./MyDataSaveButton";
+import { MydataRow } from "./MydataRow";
 
 export const EmailModule = () => {
-
   const { user, email, isLoadingEmail } = useContext(UserContext);
 
   const [hasChanged, setHasChanged] = useState(false);
@@ -15,25 +15,32 @@ export const EmailModule = () => {
     if (email !== email_address) {
       setHasChanged(true);
     } else setHasChanged(false);
-  }, [email, email_address])
+  }, [email, email_address]);
 
   return (
     <>
-      <div className="inline text-secondary-base border-r-2 border-secondary-base">Email</div>
-      <div className="inline relative ml-2">
+      <MydataRow labelText={"Email"}>
         <EditInput type={"email"} value={email} setValue={user.setEmail} />
-      </div>
-      {
-        hasChanged ?
-          <>
-            <div className="inline text-secondary-base border-r-2 border-secondary-base">Contraseña</div>
-            <div className="inline relative ml-2">
-              <EditInput type={'password'} setValue={() => {}} />
-            </div>
-            <MyDataSaveButton isLoading={isLoadingEmail} />
-          </> :
-          <></>
-      }
+      </MydataRow>
+
+      {hasChanged ? (
+        <>
+          <MydataRow labelText={"Confirmar email"}>
+            <EditInput
+              type={"email"}
+              setValue={() => {}}
+            />
+          </MydataRow>
+
+          <MydataRow labelText={"Contraseña"}>
+            <EditInput type={"password"} setValue={() => {}} />
+          </MydataRow>
+
+          <MyDataSaveButton isLoading={isLoadingEmail} />
+        </>
+      ) : (
+        <></>
+      )}
     </>
-  )
-}
+  );
+};

@@ -19,6 +19,10 @@ export default {
         tertiary: {
           dark: 'var(--color-tertiary-dark)',
           light: 'var(--color-tertiary-light)'
+        },
+        app: {
+          white: 'var(--color-app-white)',
+          black: 'var(--color-app-black)'
         }
       }
     },

@@ -12,7 +12,7 @@ import { dayAbbr, monthAbbr } from '../../helpers/time';
 
 export const UserDashboard = () => {
 
-  const { firstName } = useContext(UserContext);
+  const { firstName, user } = useContext(UserContext);
   const { date, day, month, hours, minutes } = useContext(TimeContext);
 
   const handleLogout = async () => {
@@ -27,7 +27,15 @@ export const UserDashboard = () => {
           <div className='text-xl'>
             <Link to={'home'} className='block mb-2 font-extralight'>Inico</Link>
             <Link to={'appointments'} className='block mb-2 font-extralight'>Agenda</Link>
-            <Link to={'patients'} className='block mb-2 font-extralight'>Pacientes</Link>
+            {
+              user.role.current === 'patient'?
+                <>
+                  <Link to={'psychologist'} className='block mb-2 font-extralight'>Mi psicolog@</Link>
+                </> :
+              (user.role.current === 'psychologist')?
+                <Link to={'patient'} className='block mb-2 font-extralight'>Mis Pacientes</Link> :
+                <></>
+            }
           </div>
           <div className='mt-auto mb-auto'>
             <LinkWithIcon className={'mt-3 font-extralight'} text={'Mis datos'} to={'./mydata'}>

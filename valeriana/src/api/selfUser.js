@@ -76,6 +76,7 @@ export class SelfUser {
     };
     const res = await fetch("/v1/users/self/email", options);
     const body = await res.json();
+
     redirect(res, body);
 
     return { res, body };
@@ -92,6 +93,10 @@ export class SelfUser {
 
     const res = await fetch("/v1/users/self/validateEmail", options);
     const body = await res.json();
+
+    if (res.status === 200) {
+      window.location.href = '/app/user/home';
+    }
 
     redirect(res, body);
 

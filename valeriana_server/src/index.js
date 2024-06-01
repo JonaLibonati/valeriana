@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { corsMiddleware } from './middlewares/cors.js';
 import { usersRouter } from './routes/v1/users.js';
 import cookieParser from 'cookie-parser';
+import { contactsRouter } from './routes/v1/contacts.js';
 
 // Reading a JSON with ESM.
 // import { createRequire } from 'node:module';
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/v1/users', usersRouter);
+app.use('/v1/contacts', contactsRouter);
 
 app.use((req, res) => {
     res.status(404).send('Error 404. Page not found');

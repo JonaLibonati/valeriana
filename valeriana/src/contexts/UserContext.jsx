@@ -1,5 +1,6 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { SelfUser } from "../api/selfUser";
+import { validateFirstName, validateLastName, validateNewEmail, validateUserName } from "../schemes/userSchema";
 
 export const UserContext = createContext(null);
 
@@ -11,10 +12,12 @@ export const UserProvider = ({ children }) => {
   const [email, setEmail] = useState('');
 
   const userData = useRef({});
+  const roleId = useRef('');
   const role = useRef('');
 
   const user = {
     data: userData,
+    roleId,
     role,
     setUserName,
     setFirstName,
@@ -30,7 +33,8 @@ export const UserProvider = ({ children }) => {
         user.setLastName(body.last_name);
         user.setEmail(body.email_address);
         user.data.current = body;
-        user.role.current = body.user_roleId;
+        user.roleId.current = body.user_roleId;
+        user.role.current = body.role_name;
       })
       .catch(console.error)
   }, [])
@@ -50,14 +54,26 @@ export const UserProvider = ({ children }) => {
 
       const { usePopUp } = setters;
 
-      const userData = {
+      let input = {
         user_name: e.target[0].value == "" ? undefined : e.target[0].value,
       };
 
-      if (user_name !== userData.user_name) {
+      input = validateUserName(input);
+
+      if (!input.success) {
+        console.log(input.error.issues);
+        const message = input.error.issues[0].message;
+
+        message === "Required"
+          ? usePopUp("Todos los campos son requeridos", "error")
+          : usePopUp(message, "error");
+        return;
+      }
+
+      if (user_name !== input.data.user_name) {
         setIsLoadingUserName(true);
         try {
-          const { res, body } = await SelfUser.setUserName(userData);
+          const { res, body } = await SelfUser.setUserName(input.data);
           const { user_name } = body;
 
           if (res.status === 200) {
@@ -80,15 +96,27 @@ export const UserProvider = ({ children }) => {
 
       const { usePopUp } = setters;
 
-      const userData = {
+      let input = {
         first_name: e.target[0].value == "" ? undefined : e.target[0].value,
       };
 
-      if (first_name !== userData.first_name) {
+      input = validateFirstName(input);
+
+      if (!input.success) {
+        console.log(input.error.issues);
+        const message = input.error.issues[0].message;
+
+        message === "Required"
+          ? usePopUp("Todos los campos son requeridos", "error")
+          : usePopUp(message, "error");
+        return;
+      }
+
+      if (first_name !== input.data.first_name) {
         setIsLoadingFirstName(true);
 
         try {
-          const { res, body } = await SelfUser.setFirstName(userData);
+          const { res, body } = await SelfUser.setFirstName(input.data);
           const { first_name } = body;
 
           if (res.status === 200) {
@@ -109,15 +137,27 @@ export const UserProvider = ({ children }) => {
       const { last_name } = user.data.current;
       const { usePopUp } = setters;
 
-      const userData = {
+      let input = {
         last_name: e.target[0].value == "" ? undefined : e.target[0].value,
       };
 
-      if (last_name !== userData.last_name) {
+      input = validateLastName(input);
+
+      if (!input.success) {
+        console.log(input.error.issues);
+        const message = input.error.issues[0].message;
+
+        message === "Required"
+          ? usePopUp("Todos los campos son requeridos", "error")
+          : usePopUp(message, "error");
+        return;
+      }
+
+      if (last_name !== input.data.last_name) {
         setIsLoadingLastName(true);
 
         try {
-          const { res, body } = await SelfUser.setLastName(userData);
+          const { res, body } = await SelfUser.setLastName(input.data);
           const { last_name } = body;
 
           if (res.status === 200) {
@@ -138,14 +178,29 @@ export const UserProvider = ({ children }) => {
       const { email_address } = user.data.current;
       const { usePopUp } = setters;
 
-      const userData = {
+      let input = {
         email_address: e.target[0].value == "" ? undefined : e.target[0].value,
+        confirm_email: e.target[1].value == "" ? undefined : e.target[1].value,
+        user_password: e.target[2].value == "" ? undefined : e.target[2].value,
       };
 
-      if (email_address !== userData.email_address) {
+      input = validateNewEmail(input);
+
+
+      if (!input.success) {
+        console.log(input.error.issues);
+        const message = input.error.issues[0].message;
+
+        message === "Required"
+          ? usePopUp("Todos los campos son requeridos", "error")
+          : usePopUp(message, "error");
+        return;
+      }
+
+      if (email_address !== input.data.email_address) {
         setIsLoadingEmail(true);
         try {
-          const { res, body } = await SelfUser.setEmail(userData);
+          const { res, body } = await SelfUser.setEmail(input.data);
           const { email_address } = body;
 
           if (res.status === 200) {

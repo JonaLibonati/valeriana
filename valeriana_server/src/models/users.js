@@ -47,11 +47,61 @@ export class UserModel {
         return user[0];
     }
 
+    static async searchUser ({ input }) {
+        const searchValue = input;
+
+        const [users] = await connection.query (
+            `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, first_name, last_name FROM users WHERE user_name = ? OR email_address = ? OR first_name = ? OR last_name = ?;`, [searchValue, searchValue, searchValue, searchValue]
+        );
+
+        console.log(users)
+
+        return users;
+    }
+
+    static async searchPsychologist ({ input }) {
+        const searchValue = input;
+
+        const [users] = await connection.query (
+            `SELECT BIN_TO_UUID(user_id) user_id, user_name, email_address, first_name, last_name FROM psychologists WHERE user_name = ? OR email_address = ? OR first_name = ? OR last_name = ?;`, [searchValue, searchValue, searchValue, searchValue]
+        );
+
+        console.log(users)
+
+        return users;
+    }
+
+    static async isPatient ({ input }) {
+        const { user_id } = input;
+
+        console.log(user_id)
+
+        const [[result]] = await connection.query (
+            `SELECT COUNT(user_id) FROM patients WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        console.log("isPatient:", result['COUNT(user_id)'])
+
+        return result['COUNT(user_id)'];
+    }
+
+    static async isPsychologist ({ input }) {
+        const { user_id } = input;
+
+        const [bool] = await connection.query (
+            `SELECT COUNT(user_id) FROM psychologists WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+        );
+
+        console.log("isPsychologist:", bool)
+
+        return bool;
+    }
+
     static async getUser ({ input }) {
         const { user_id } = input;
 
         const [user] = await connection.query (
-            `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at FROM users WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+            `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, role_name, email_address, email_isValidated, first_name, last_name, created_at FROM users INNER JOIN roles ON users.user_roleId = roles.role_id WHERE user_id = UUID_TO_BIN(?);`, [user_id]
         );
 
         return user[0];
@@ -156,7 +206,7 @@ export class UserModel {
         const { email_address, user_id } = input;
 
         await connection.query(
-            'UPDATE users SET email_address = ? WHERE user_id = UUID_TO_BIN(?);', [email_address, user_id]
+            'UPDATE users SET email_address = ?, email_isValidated = 0 WHERE user_id = UUID_TO_BIN(?);', [email_address, user_id]
         );
 
         return this.getEmail({ input });
