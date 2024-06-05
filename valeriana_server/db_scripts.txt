@@ -4,7 +4,11 @@ SHOW DATABASES;
 
 USE valeriana_db;
 
+SET FOREIGN_KEY_CHECKS=0;
+
 DROP TABLE users;
+
+-- USERS TABLE
 
 CREATE TABLE users (
 	user_id BINARY(16) DEFAULT (UUID_TO_BIN(uuid())),
@@ -16,7 +20,162 @@ CREATE TABLE users (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT (now()),
+    FOREIGN KEY(user_roleId) REFERENCES roles(role_id),
     PRIMARY KEY(user_id)
+);
+
+ALTER TABLE users
+ADD FOREIGN KEY (user_roleId) REFERENCES roles(role_id);
+
+ALTER TABLE users
+ADD CONSTRAINT foreign_role_key
+FOREIGN KEY (user_roleId) REFERENCES roles(role_id);
+
+SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, user_password, email_address, email_isValidated, first_name, last_name, created_at FROM users;
+
+SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, role_name, user_password, email_address, email_isValidated, first_name, last_name, created_at FROM users
+INNER JOIN roles ON users.user_roleId = roles.role_id;
+
+UPDATE users SET user_roleId = 2 WHERE email_address = 'jona@gmail.com';
+
+----------------------------
+-- PATIENTS VIEW
+DROP VIEW patients;
+
+CREATE VIEW patients AS
+SELECT user_id, user_name, user_password, email_address, first_name, last_name, created_at 
+FROM users WHERE user_roleId = 2;
+
+SELECT COUNT(user_id) FROM patients WHERE user_id = UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe');
+
+SELECT *, BIN_TO_UUID(user_id) FROM patients;
+----------------------------
+-- PSYCHOLOGIST  VIEW
+DROP VIEW psychologists;
+
+CREATE VIEW psychologists AS
+SELECT user_id, user_name, user_password, email_address, first_name, last_name, created_at 
+FROM users WHERE user_roleId = 3;
+
+SELECT COUNT(user_id) FROM psychologists WHERE user_id = UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe');
+
+SELECT *, BIN_TO_UUID(user_id) user_id FROM psychologists;
+----------------------------
+-- DOCTORS VIEW
+DROP VIEW doctors;
+
+CREATE VIEW doctors AS
+SELECT user_id, user_name, user_password, email_address, first_name, last_name, created_at 
+FROM users WHERE user_roleId = 4;
+
+SELECT COUNT(user_id) FROM doctors WHERE user_id = UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe');
+
+SELECT * FROM doctors;
+----------------------------
+-- ROLES TABLE
+DROP TABLE roles;
+
+CREATE TABLE roles (
+	role_id INT NOT NULL AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    FOREIGN KEY(role_id) REFERENCES users(user_roleId),
+	PRIMARY KEY(role_id)
+);
+
+INSERT INTO roles (role_name) VALUES ('admin'), ('patient'), ('psychologist'), ('doctor');
+----------------------------
+-- TABLE PSYCHOLOGIST-PATIENTS
+CREATE TABLE psychologists_patients (
+	psychologist_id BINARY(16) NOT NULL,
+    patient_id BINARY(16) NOT NULL UNIQUE,
+    isAccepted BOOLEAN NOT NULL DEFAULT (0),
+    FOREIGN KEY(psychologist_id) REFERENCES users(user_id),
+    FOREIGN KEY(patient_id) REFERENCES users(user_id),
+    PRIMARY KEY(psychologist_id, patient_id)
+);
+
+
+DROP TRIGGER limit_only_psychologists_patients_relationship;
+
+delimiter //
+CREATE TRIGGER limit_only_psychologists_patients_relationship
+	BEFORE INSERT ON psychologists_patients
+    FOR EACH ROW
+    BEGIN 
+		IF NOT EXISTS (SELECT * FROM psychologists WHERE user_id = NEW.psychologist_id) OR 
+		NOT EXISTS (SELECT * FROM patients WHERE user_id = NEW.patient_id)
+        THEN SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'ER_PSYCHOLOGIST_PATIENT_ONLY only psychologists patients relationship are allowed';
+		END IF;
+	END;
+//
+delimiter ;
+
+INSERT INTO psychologists_patients (psychologist_id, patient_id)
+VALUES (UUID_TO_BIN('03b940b1-fc32-11ee-8cff-704d7b63e3fe'), UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe'));
+-- patient 03b940b1-fc32-11ee-8cff-704d7b63e3fe  'ddf8d717-f692-11ee-9a3e-704d7b63e3fe'
+-- doctor 0f7b6945-fc2e-11ee-8cff-704d7b63e3fe 'a887d8ae-fc2d-11ee-8cff-704d7b63e3fe'
+
+ALTER TABLE psychologists_patients
+ADD CONSTRAINT check_id_equality
+CHECK (psychologist_id <> patient_id);
+
+DROP TABLE psychologists_patients;
+
+SELECT BIN_TO_UUID(psychologist_id) psychologist_id, BIN_TO_UUID(patient_id) patient_id FROM psychologists_patients;
+
+SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at 
+FROM psychologists_patients
+INNER JOIN users ON users.user_id = psychologists_patients.psychologist_id
+WHERE patient_id = UUID_TO_BIN('433738e4-fceb-11ee-8cff-704d7b63e3fe');
+----------------------------
+-- TABLE DOCTORS-PATIENTS
+CREATE TABLE doctors_patients (
+	doctor_id BINARY(16) NOT NULL,
+    patient_id BINARY(16) NOT NULL,
+    FOREIGN KEY(doctor_id) REFERENCES users(user_id),
+    FOREIGN KEY(patient_id) REFERENCES users(user_id),
+    PRIMARY KEY(doctor_id, patient_id)
+);
+
+
+DROP TRIGGER limit_only_doctors_patients_relationship;
+
+delimiter //
+CREATE TRIGGER limit_only_doctors_patients_relationship
+	BEFORE INSERT ON doctors_patients
+    FOR EACH ROW
+    BEGIN 
+		IF NOT EXISTS (SELECT * FROM doctors WHERE user_id = NEW.doctor_id) OR 
+		NOT EXISTS (SELECT * FROM patients WHERE user_id = NEW.patient_id)
+        THEN SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'ER_DOCTOR_PATIENT_ONLY only doctors patients relationship are allowed';
+		END IF;
+	END;
+//
+delimiter ;
+
+INSERT INTO doctors_patients (doctor_id, patient_id)
+VALUES (UUID_TO_BIN('0f7b6945-fc2e-11ee-8cff-704d7b63e3fe'), UUID_TO_BIN('ddf8d717-f692-11ee-9a3e-704d7b63e3fe'));
+-- patient 03b940b1-fc32-11ee-8cff-704d7b63e3fe  'ddf8d717-f692-11ee-9a3e-704d7b63e3fe'
+-- doctor 0f7b6945-fc2e-11ee-8cff-704d7b63e3fe 'a887d8ae-fc2d-11ee-8cff-704d7b63e3fe'
+
+ALTER TABLE doctors_patients
+ADD CONSTRAINT check_id_equality
+CHECK (doctor_id <> patient_id);
+
+DROP TABLE doctors_patients;
+
+SELECT BIN_TO_UUID(doctor_id) doctor_id, BIN_TO_UUID(patient_id) patient_id FROM doctors_patients;
+----------------------------
+
+
+CREATE TABLE notifications (
+	id BINARY(16) NOT NULL,
+    user_id BINARY(16) NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(user_id),
+    PRIMARY KEY(id)
 );
 
 DELETE FROM users WHERE user_id = UUID_TO_BIN('20a311b3-f21a-11ee-82c8-704d7b63e3fe');
@@ -25,19 +184,9 @@ INSERT INTO users (user_name, user_roleId, user_password, email_address, first_n
 VALUES
 ('digital', '2','$2b$10$wPEWsw8T0M47UtMigExrneS4I0tGRE1rl0pdF93e3e5nNmrqoeRGe', 'jona@gmail.com', 'Jonathan', 'Libonati');
 
-DROP TABLE roles;
-
-CREATE TABLE roles (
-	role_id INT NOT NULL AUTO_INCREMENT,
-    role_name VARCHAR(50) NOT NULL UNIQUE,
-    PRIMARY KEY(role_id)
-);
-
-INSERT INTO roles (role_name) VALUES ('admin'), ('doctor'), ('patient');
-
-SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, user_password, email_address, email_isValidated, first_name, last_name, created_at FROM users;
 SELECT * FROM users WHERE user_id = UUID_TO_BIN('3cd8b37a-f216-11ee-82c8-704d7b63e3fe');
 SELECT * FROM roles;
+SELECT * FROM users;
 
 SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name FROM users WHERE user_name = 'digital';
 
@@ -48,3 +197,4 @@ DELETE FROM users WHERE user_id = UUID_TO_BIN('8d38b3bf-f218-11ee-82c8-704d7b63e
 SELECT email_isValidated FROM users WHERE user_id = UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe');
 
 UPDATE users SET email_isValidated = 0 WHERE user_id = UUID_TO_BIN('fffa077e-f6d5-11ee-9a3e-704d7b63e3fe');
+UPDATE users SET first_name = 'jonathan' WHERE user_id = UUID_TO_BIN('da3fe20d-fc26-11ee-8cff-704d7b63e3fe');SELECT * FROM roles;
