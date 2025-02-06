@@ -42,7 +42,7 @@ export class ContactPsychologistModel {
     const { patient_id } = input;
 
     const [list] = await connection.query(
-      `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at, isAccepted
+      `SELECT BIN_TO_UUID(psychologist_patient_id) psychologist_patient_id, BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at, isAccepted
         FROM psychologists_patients
         INNER JOIN users ON users.user_id = psychologists_patients.psychologist_id
         WHERE patient_id = UUID_TO_BIN(?);`,
@@ -68,14 +68,31 @@ export class ContactPsychologistModel {
   }
 }
 
-export class ContactDoctorModel {
-  static async create({ input }) {
-    const { doctor_id, patient_id } = input;
+export class ContactPatientModel {
+  static async getContatctList({ input }) {
+    const { psychologist_id } = input;
+
+    const [list] = await connection.query(
+      `SELECT BIN_TO_UUID(psychologist_patient_id) psychologist_patient_id, BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at, isAccepted
+        FROM psychologists_patients
+        INNER JOIN users ON users.user_id = psychologists_patients.patient_id
+        WHERE psychologist_id = UUID_TO_BIN(?);`,
+      [psychologist_id]
+    );
+
+    console.log(list);
+
+    return list;
+  }
+
+  static async delete({ input }) {
+    const { patient_id, psychologist_id } = input;
+
+    console.log( patient_id, psychologist_id)
 
     await connection.query(
-      `INSERT INTO doctors_patients (doctor_id, patient_id)
-        VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?));`,
-      [doctor_id, patient_id]
+      `DELETE FROM psychologists_patients WHERE patient_id = UUID_TO_BIN(?) AND psychologist_id = UUID_TO_BIN(?);`,
+      [patient_id, psychologist_id]
     );
 
     const list = await this.getContatctList({ input });
@@ -83,19 +100,19 @@ export class ContactDoctorModel {
     return list;
   }
 
-  static async getContatctList({ input }) {
-    const { patient_id } = input;
+  static async accept({ input }) {
+    const { patient_id, psychologist_id } = input;
 
-    const [list] = await connection.query(
-      `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at
-        FROM doctors_patients
-        INNER JOIN users ON users.user_id = doctors_patients.doctor_id
-        WHERE patient_id = UUID_TO_BIN(?);`,
-      [patient_id]
+    console.log( patient_id, psychologist_id)
+
+    await connection.query(
+      `UPDATE psychologists_patients SET isAccepted = 1 WHERE patient_id = UUID_TO_BIN(?) AND psychologist_id = UUID_TO_BIN(?);`,
+      [patient_id, psychologist_id]
     );
 
-    console.log(list);
+    const list = await this.getContatctList({ input });
 
     return list;
   }
+
 }

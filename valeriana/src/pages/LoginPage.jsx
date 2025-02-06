@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { LoginForm } from "../components/login/LoginForm";
+import { EmailSentMessage } from "../components/login/EmailSentMessage";
 
 export const LoginPage = () => {
 
@@ -14,7 +15,7 @@ export const LoginPage = () => {
           <LoginForm setNewPassEmail={setNewPassEmail} setNewPassIsSent={setNewPassIsSent} />
         </>
       ) : (
-        <EmailSentMessage handleGoBack={handleGoBack} email={newPassEmail}/>
+        <EmailSentMessage handleGoBack={() => setNewPassIsSent(false)} email={newPassEmail}/>
       )}
     </>
   );

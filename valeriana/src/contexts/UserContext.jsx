@@ -37,7 +37,7 @@ export const UserProvider = ({ children }) => {
         user.role.current = body.role_name;
       })
       .catch(console.error)
-  }, [])
+  }, [user.role.current])
 
   const [isLoadingUserName, setIsLoadingUserName] = useState(false);
   const [isLoadingFirstName, setIsLoadingFirstName] = useState(false);

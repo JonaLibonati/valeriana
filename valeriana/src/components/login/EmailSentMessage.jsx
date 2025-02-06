@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoBackButton } from "../globalComponents/GoBackButton";
+import { GoBackButton } from "../globalComponents/buttons/GoBackButton";
 
 export const EmailSentMessage = ({ handleGoBack, email }) => {
   return (

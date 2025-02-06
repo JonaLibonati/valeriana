@@ -1,9 +1,10 @@
 import React, { useContext } from 'react'
 import { DateContext } from '../../../contexts/DateContext'
+import { monthAbbr, monthNames } from '../../../helpers/time'
 
 export const MonthSeletor = () => {
 
-    const { selectedDate, monthNames, monthAbbr, setMonth, setMonthSelector } = useContext(DateContext)
+    const { selectedDate, setMonth, setMonthSelector } = useContext(DateContext)
 
     const handleClick = (i) => {
         setMonth(monthNames[i]);
@@ -12,7 +13,7 @@ export const MonthSeletor = () => {
     }
 
     return (
-        <div className='absolute flex size-full bg-rose-50'>
+        <div className='absolute flex size-full bg-tertiary-light'>
             <div className='grid grid-cols-3 grid-row-3 gap-2 justify-items-center items-center basis-full'>
                 { monthAbbr.map( (text, i) => <button onClick={() => handleClick(i)}>{text}</button> ) }
             </div>

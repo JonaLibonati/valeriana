@@ -1,19 +1,22 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import { ContactPsychologist } from "../api/contact";
+import { UserContext } from "./UserContext";
 
 
 export const PsychologistContext = createContext(null);
 
 export const PsychologistProvider = ({ children }) => {
 
-  const [myPsychologists, setMyPsychologists] = useState([]);
+  const { user } = useContext(UserContext);
+
+  const [myPsychologist, setMyPsychologist] = useState([]);
 
   class PsychologistHelpers {
     static async handleContact (e, psychologistData) {
       console.log(psychologistData);
       ContactPsychologist.create(psychologistData)
         .then(({ res, body }) => {
-          if (res.status === 201) setMyPsychologists(body);
+          if (res.status === 201) setMyPsychologist(body);
           else console.error(res);
         })
         .catch((e) => console.error(e));
@@ -22,7 +25,7 @@ export const PsychologistProvider = ({ children }) => {
     static async handleDelete (e) {
       ContactPsychologist.delete()
         .then(({ res, body }) => {
-          if (res.status === 201) setMyPsychologists(body);
+          if (res.status === 201) setMyPsychologist(body);
           else console.error(res);
         })
         .catch((e) => console.error(e));
@@ -30,17 +33,19 @@ export const PsychologistProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    ContactPsychologist.getContactList().then(({ res, body }) => {
-      console.log(body)
-      if (res.status === 200) setMyPsychologists(body);
-      else console.error(res);
-    });
-  }, []);
+    if ( user.role.current == 'patient') {
+      ContactPsychologist.getContactList().then(({ res, body }) => {
+        console.log(body)
+        if (res.status === 200) setMyPsychologist(body);
+        else console.error(res);
+      });
+    }
+  }, [user.role.current]);
 
   return (
     <PsychologistContext.Provider value={{
-      myPsychologists,
-      setMyPsychologists,
+      myPsychologist,
+      setMyPsychologist,
       PsychologistHelpers
     }}>
       {children}

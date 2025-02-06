@@ -121,7 +121,6 @@ export class UserMiddelwares {
       if (isPatient) {
         next();
       } else {
-        console.error(user.error);
         res.status(403).json({ code: "ER_FORBIDDEN" }).end();
       }
     } catch (e) {
@@ -137,7 +136,6 @@ export class UserMiddelwares {
       if (!isPatient) {
         next();
       } else {
-        console.error(user.error);
         res.status(403).json({ code: "ER_FORBIDDEN" }).end();
       }
     } catch (e) {

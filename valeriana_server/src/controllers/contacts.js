@@ -1,5 +1,5 @@
 import {
-  ContactDoctorModel,
+  ContactPatientModel,
   ContactPsychologistModel,
 } from "../models/contacts.js";
 
@@ -50,3 +50,49 @@ export class ContactPsychologistController {
     }
   }
 }
+
+export class ContactPatientController {
+  static async getContactList(req, res) {
+    try {
+      const input = {
+        psychologist_id: req.body.payload.user_id,
+      };
+      const contactList = await ContactPatientModel.getContatctList({
+        input,
+      });
+      res.status(200).json({ contactList: contactList });
+    } catch (e) {
+      console.error(e);
+      res.status(400).send();
+    }
+  }
+
+  static async delete(req, res) {
+    try {
+      const input = {
+        patient_id: req.body.user_id,
+        psychologist_id: req.body.payload.user_id
+      };
+      const contactList = await ContactPatientModel.delete({ input });
+      res.status(201).json({ contactList: contactList });
+    } catch (e) {
+      console.error(e);
+      res.status(400).send();
+    }
+  }
+
+  static async accept(req, res) {
+    try {
+      const input = {
+        patient_id: req.body.user_id,
+        psychologist_id: req.body.payload.user_id
+      };
+      const contactList = await ContactPatientModel.accept({ input });
+      res.status(201).json({ contactList: contactList });
+    } catch (e) {
+      console.error(e);
+      res.status(400).send();
+    }
+  }
+}
+

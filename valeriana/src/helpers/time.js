@@ -18,50 +18,23 @@ export const updateTime = ({ setDate, setDay, setMonth, setHours, setMinutes }) 
   setTimeout(updateTime, 60000, { setDate, setDay, setMonth, setHours, setMinutes });
 }
 
-export const monthNames = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre"]; // array of month names
+export const toUtcMySqlDate = (DateObject) => {
+  return DateObject.toISOString().slice(0, 19).replace('T', ' ')
+}
 
-export const monthAbbr = [
-  "Ene",
-  "Feb",
-  "Mar",
-  "Abr",
-  "May",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dic"]; // array of month Abbreviation
+export const toUtcMySqlTime = (minutes) => {
+  const hours = Math.floor(Math.abs(minutes)/60)
+  const minuteMod = minutes - hours * 60
 
-export const dayNames = [
-  "Domingo",
-  "Lunes",
-  "Martes",
-  "Miercoles",
-  "Jueves",
-  "Viernes",
-  "Sabado"]; // array of day names
+  return `${hours}:${minuteMod}:00`
+}
 
-export const dayAbbr = [
-  "Dom",
-  "Lun",
-  "Mar",
-  "Mie",
-  "Jue",
-  "Vie",
-  "Sab"]; // array of day Abbreviation
+export const toDate = (mysqlDateTime) => {
+  return new Date(mysqlDateTime)
+}
 
-export const dayLetter = ['D', 'L', 'M', 'M', 'J', 'V', 'S']; // array of day Abbreviation
+export const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+export const monthAbbr = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+export const dayNames = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+export const dayAbbr = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+export const dayLongAbbr = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];

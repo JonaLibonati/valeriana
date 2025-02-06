@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import { UserContext } from "../../contexts/UserContext";
+import React from "react";
 import { RoleInput } from "./RoleInput";
 
 export const Roles = ({ setRoleId }) => {

@@ -6,31 +6,31 @@ import { MonthSeletor } from './subcomponents/MonthSeletor';
 import { Year } from './subcomponents/Year';
 import { YearSeletor } from './subcomponents/YearSeletor';
 import { SeletedDate } from './subcomponents/SeletedDate';
-import { Date } from './subcomponents/Date';
+import { DateNumber } from './subcomponents/DateNumber';
 import { Hour } from './subcomponents/Hour';
 
-export const CalendarPage = () => {
+export const CalendarDate = () => {
 
-    const { days, dayAbbr, monthSelector, yearSelector } = useContext(DateContext);
+    const { daysInSelectedMonth, dayAbbr, monthSelector, yearSelector } = useContext(DateContext);
 
     return (
-    <div className='m-[200px]'>
-        <div className='rounded-md bg-rose-300 w-[300px] relative'>
+    <div className='m-[30px] ml-[200px]'>
+        <div className='rounded-md bg-primary-base w-[300px] relative'>
             <SeletedDate />
-            <div className='rounded-md bg-rose-50 p-4'>
+            <div className='rounded-md bg-tertiary-light p-4'>
                 <div className='relative '>
                     {monthSelector? <MonthSeletor /> : <></>}
-                    {yearSelector? <YearSeletor /> : <></>}
+                    {yearSelector? <YearSeletor className={'absolute bg-tertiary-light'}/> : <></>}
                     <div className='flex'>
                         <Month />
                         <Year />
                     </div>
-                    <div className='grid grid-cols-7 gap-2 justify-items-center items-center h-[300px] '>
+                    <div className='grid grid-cols-7 gap-[2px] justify-items-center items-center h-[300px] '>
                         { dayAbbr.map( (text) => <Day text={text}/> ) }
-                        { days.map( (text) => <Date text={text} font={'text-xs'}/> ) }
+                        { daysInSelectedMonth.map( (text) => <DateNumber text={text} font={'text-xs'}/> ) }
                     </div>
                 </div>
-                <hr className='border-gray-300'/>
+                <hr className='border-secondary-light'/>
                 <div className='grid grid-cols-5 gap-2 pt-4 justify-items-center items-center '>
                     <Hour hours={9} minutes={0} />
                     <Hour hours={10} minutes={30} />

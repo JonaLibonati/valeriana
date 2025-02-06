@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Loading } from "../globalComponents/loading/Loading";
 import { Input } from "../globalComponents/input/Input";
 import { FilledButton } from "../globalComponents/buttons/FilledButton";
-import { GoBackButton } from "../globalComponents/GoBackButton";
+import { GoBackButton } from "../globalComponents/buttons/GoBackButton";
 import { RegisterHelpers } from "../../helpers/registerHelpers";
 import { PopUpContext } from "../../contexts/PopUpContext";
 

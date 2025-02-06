@@ -17,13 +17,13 @@ export const Hour = ({ hours, minutes }) => {
         const array2 = [hours, minutes];
 
         if (selectedDate.current.getHours() === hours && selectedDate.current.getMinutes() === minutes && hour.length != 0) {
-            div.current.classList.add('bg-white')
+            div.current.classList.add('bg-primary-base')
         }
-        else {div.current.classList.remove('bg-white')}
+        else {div.current.classList.remove('bg-primary-base')}
     }, [hour])
 
     useEffect(() => {
-        div.current.classList.remove('bg-white');
+        div.current.classList.remove('bg-primary-base');
         setHour([])
     }, [date, days])
 

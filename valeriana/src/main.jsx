@@ -19,10 +19,13 @@ import { MydataPage } from "./pages/MydataPage";
 import { PopUpProvider } from "./contexts/PopUpContext";
 import { UserProvider } from "./contexts/UserContext";
 import { TimeProvider } from "./contexts/TimeContext";
+import { DateProvider } from "./contexts/DateContext";
 import { HomePage } from "./pages/HomePage";
 import { PsychologistPage } from "./pages/PsychologistPage";
 import { PatientsPage } from "./pages/PatientsPage";
 import { PsychologistProvider } from "./contexts/PsychologistContext";
+import { PatientProvider } from "./contexts/PatientContext";
+import { AppointmentsPage } from "./pages/AppointmentsPage";
 
 const router = createBrowserRouter([
   {
@@ -59,19 +62,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <HomePage/>,
+        element: <PatientProvider><PsychologistProvider><HomePage/></PsychologistProvider></PatientProvider>,
       },
       {
         path: "home",
-        element: <PsychologistProvider><HomePage/></PsychologistProvider>,
+        element: <PatientProvider><PsychologistProvider><HomePage/></PsychologistProvider></PatientProvider>,
       },
       {
         path: "appointments",
-        element: <></>,
+        element: <DateProvider><PatientProvider><PsychologistProvider><AppointmentsPage/></PsychologistProvider></PatientProvider></DateProvider>,
       },
       {
         path: "patients",
-        element: <PatientsPage />,
+        element: <PatientProvider><PatientsPage /></PatientProvider>,
       },
       {
         path: "psychologist",
@@ -84,7 +87,7 @@ const router = createBrowserRouter([
       {
         path: "config",
         element: <ConfigPage />,
-      }
+      },
     ]
   },
 ]);

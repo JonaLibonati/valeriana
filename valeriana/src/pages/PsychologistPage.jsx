@@ -6,12 +6,15 @@ import { UserResult } from "../components/globalComponents/searcher/UserResult";
 import { User } from "../api/user";
 import { UserContext } from "../contexts/UserContext";
 import { PsychologistContext } from "../contexts/PsychologistContext";
+import { ContactTemplate } from "../components/globalComponents/contactTemplate/ContactTemplate";
+import { XIcon } from "../components/globalComponents/icons/XIcon";
 
 export const PsychologistPage = () => {
   const [results, setResults] = useState([]);
 
   const { user } = useContext(UserContext);
-  const { myPsychologists, PsychologistHelpers } = useContext(PsychologistContext);
+  const { myPsychologist, PsychologistHelpers } =
+    useContext(PsychologistContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +29,7 @@ export const PsychologistPage = () => {
     <>
       {user.role.current === "patient" ? (
         <div className="grid gap-3">
-          {myPsychologists.length === 0 ? (
+          {myPsychologist.length === 0 ? (
             <Section className={"relative"}>
               <>
                 <SearcherBar
@@ -42,7 +45,9 @@ export const PsychologistPage = () => {
                     results.map((res) => (
                       <UserResult
                         user={res}
-                        handleClick={(e) => PsychologistHelpers.handleContact(e, res)}
+                        handleClick={(e) =>
+                          PsychologistHelpers.handleContact(e, res)
+                        }
                       />
                     ))
                   )}
@@ -54,37 +59,33 @@ export const PsychologistPage = () => {
           )}
           <Section>
             <div className="pt-4 flex flex-wrap gap-4 justify-left">
-              {myPsychologists.length === 0 ? (
+              {myPsychologist.length === 0 ? (
                 <div className="w-full text-lg text-center text-secondary-base">
                   Todavía no has contactado a ningun psicólog@
                 </div>
               ) : (
-                myPsychologists.map((psychologist) => (
-                  <>
-                    <div className="w-full text-2xl">Mi psicolog@</div>
-                    <div className="w-full flex justify-between text-primary-dark">
-                      <div className="text-3xl">{psychologist.user_name}</div>
-                      <div className="w-max">
+                <>
+                  <div className="w-full text-2xl">Mi psicolog@</div>
+                  {myPsychologist.map((psychologist) => (
+                    <ContactTemplate
+                      user_name={psychologist.user_name}
+                      first_name={psychologist.first_name}
+                      last_name={psychologist.last_name}
+                      email_address={psychologist.email_address}
+                    >
+                      <div className="flex flex-wrap gap-4 justify-between items-center">
                         {!psychologist.isAccepted ? (
-                          <div className="inline pl-2 text-tertiary-dark">
-                            Solicitud enviada
-                          </div>
+                          <p className="text-yellow-400">Solicitud enviada</p>
                         ) : (
-                          <></>
+                          <p className="text-green-400">Solicitud aceptada</p>
                         )}
-                        <button className="pl-4" onClick={(e) => PsychologistHelpers.handleDelete(e)}>
-                          Eliminar
+                        <button className="text-secondary-base hover:text-primary-dark" onClick={(e) => PsychologistHelpers.handleDelete(e)}>
+                          <XIcon className={'size-8'}/>
                         </button>
                       </div>
-                    </div>
-                    <div className="w-full pl-2 text-sm text-tertiary-dark">
-                      {psychologist.first_name} {psychologist.last_name}
-                    </div>
-                    <div className="w-full pl-2 text-sm text-tertiary-dark">
-                      {psychologist.email_address}
-                    </div>
-                  </>
-                ))
+                    </ContactTemplate>
+                  ))}
+                </>
               )}
             </div>
           </Section>
