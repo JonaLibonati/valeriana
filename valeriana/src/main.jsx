@@ -26,6 +26,7 @@ import { PatientsPage } from "./pages/PatientsPage";
 import { PsychologistProvider } from "./contexts/PsychologistContext";
 import { PatientProvider } from "./contexts/PatientContext";
 import { AppointmentsPage } from "./pages/AppointmentsPage";
+import { Google } from "./pages/Google";
 
 const router = createBrowserRouter([
   {
