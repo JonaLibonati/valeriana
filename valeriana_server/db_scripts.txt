@@ -38,6 +38,8 @@ INNER JOIN roles ON users.user_roleId = roles.role_id;
 
 UPDATE users SET user_roleId = 2 WHERE email_address = 'jona@gmail.com';
 
+UPDATE users SET user_password = '$2b$10$N8LAMM.vW6rlM/wQftjLnu2kV9UH9jRnrEE/YKLFl1n8uDjD2YrlG' WHERE email_address = 'rata@gmail.com';
+
 ----------------------------
 -- PATIENTS VIEW
 DROP VIEW patients;
@@ -86,14 +88,14 @@ INSERT INTO roles (role_name) VALUES ('admin'), ('patient'), ('psychologist'), (
 ----------------------------
 -- TABLE PSYCHOLOGIST-PATIENTS
 CREATE TABLE psychologists_patients (
+	psychologist_patient_id BINARY(16) DEFAULT (UUID_TO_BIN(uuid())),
 	psychologist_id BINARY(16) NOT NULL,
     patient_id BINARY(16) NOT NULL UNIQUE,
     isAccepted BOOLEAN NOT NULL DEFAULT (0),
     FOREIGN KEY(psychologist_id) REFERENCES users(user_id),
     FOREIGN KEY(patient_id) REFERENCES users(user_id),
-    PRIMARY KEY(psychologist_id, patient_id)
+    PRIMARY KEY(psychologist_patient_id, patient_id)
 );
-
 
 DROP TRIGGER limit_only_psychologists_patients_relationship;
 
@@ -124,52 +126,97 @@ DROP TABLE psychologists_patients;
 
 SELECT BIN_TO_UUID(psychologist_id) psychologist_id, BIN_TO_UUID(patient_id) patient_id FROM psychologists_patients;
 
-SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at 
+SELECT * FROM psychologists_patients;
+
+SELECT BIN_TO_UUID(psychologists_patients_id) psychologists_patients_id, BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name, created_at 
 FROM psychologists_patients
 INNER JOIN users ON users.user_id = psychologists_patients.psychologist_id
 WHERE patient_id = UUID_TO_BIN('433738e4-fceb-11ee-8cff-704d7b63e3fe');
 ----------------------------
--- TABLE DOCTORS-PATIENTS
-CREATE TABLE doctors_patients (
-	doctor_id BINARY(16) NOT NULL,
-    patient_id BINARY(16) NOT NULL,
-    FOREIGN KEY(doctor_id) REFERENCES users(user_id),
-    FOREIGN KEY(patient_id) REFERENCES users(user_id),
-    PRIMARY KEY(doctor_id, patient_id)
+----------------------------
+-- TABLE MEETINGS
+SET time_zone = '+0:00';
+
+CREATE TABLE meetings (
+	meeting_id BINARY(16) DEFAULT (UUID_TO_BIN(uuid())),
+	meeting_start_time DATETIME NOT NULL,
+    meeting_duration TIME NOT NULL,
+    meeting_end_time DATETIME DEFAULT (ADDTIME(meeting_start_time, meeting_duration)),
+    psychologist_patient_id BINARY(16) NOT NULL,
+    FOREIGN KEY(psychologist_patient_id) REFERENCES psychologists_patients(psychologist_patient_id),
+    PRIMARY KEY(meeting_id)
 );
 
-
-DROP TRIGGER limit_only_doctors_patients_relationship;
-
+DROP TRIGGER limit_overlapping;
 delimiter //
-CREATE TRIGGER limit_only_doctors_patients_relationship
-	BEFORE INSERT ON doctors_patients
+CREATE TRIGGER limit_overlapping
+	BEFORE INSERT ON meetings
     FOR EACH ROW
     BEGIN 
-		IF NOT EXISTS (SELECT * FROM doctors WHERE user_id = NEW.doctor_id) OR 
-		NOT EXISTS (SELECT * FROM patients WHERE user_id = NEW.patient_id)
+		IF EXISTS (SELECT * FROM meetings WHERE NEW.meeting_start_time >= meeting_start_time AND NEW.meeting_start_time < ADDTIME(meeting_start_time, meeting_duration)) OR 
+		EXISTS (SELECT * FROM meetings WHERE ADDTIME(NEW.meeting_start_time, NEW.meeting_duration) > meeting_start_time AND ADDTIME(NEW.meeting_start_time, NEW.meeting_duration) <= ADDTIME(meeting_start_time, meeting_duration))
         THEN SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'ER_DOCTOR_PATIENT_ONLY only doctors patients relationship are allowed';
+		SET MESSAGE_TEXT = 'ER_MEETING_OVERLAPPING';
+		ELSE
+			SET NEW.meeting_end_time = ADDTIME(NEW.meeting_start_time, NEW.meeting_duration);
 		END IF;
 	END;
 //
 delimiter ;
 
-INSERT INTO doctors_patients (doctor_id, patient_id)
-VALUES (UUID_TO_BIN('0f7b6945-fc2e-11ee-8cff-704d7b63e3fe'), UUID_TO_BIN('ddf8d717-f692-11ee-9a3e-704d7b63e3fe'));
--- patient 03b940b1-fc32-11ee-8cff-704d7b63e3fe  'ddf8d717-f692-11ee-9a3e-704d7b63e3fe'
--- doctor 0f7b6945-fc2e-11ee-8cff-704d7b63e3fe 'a887d8ae-fc2d-11ee-8cff-704d7b63e3fe'
+INSERT INTO meetings (meeting_start_time, meeting_duration, psychologists_patients_id)
+VALUES
+('2003-01-02 00:01:02','00:1:30', '1');
 
-ALTER TABLE doctors_patients
-ADD CONSTRAINT check_id_equality
-CHECK (doctor_id <> patient_id);
+SELECT * FROM meetings ORDER BY psychologist_patient_id, meeting_start_time;
 
-DROP TABLE doctors_patients;
+SELECT BIN_TO_UUID(meeting_id) meeting_id, BIN_TO_UUID(meetings.psychologist_patient_id) psychologist_patient_id, BIN_TO_UUID(psychologist_id) psychologist_id, BIN_TO_UUID(patient_id) patient_id, meeting_start_time, meeting_end_time, meeting_duration
+FROM meetings
+INNER JOIN psychologists_patients ON psychologists_patients.psychologist_patient_id = meetings.psychologist_patient_id
+ORDER BY psychologist_patient_id, meeting_start_time;
 
-SELECT BIN_TO_UUID(doctor_id) doctor_id, BIN_TO_UUID(patient_id) patient_id FROM doctors_patients;
+
+DROP TABLE meetings;
 ----------------------------
+CREATE TABLE meetingRules (
+	rule_id BINARY(16) DEFAULT (UUID_TO_BIN(uuid())),
+	rule_query DATETIME NOT NULL,
+    psychologists_patients_id BINARY(16),
+    psychologists_id BINARY(16) NOT NULL,
+    FOREIGN KEY(psychologists_patients_id) REFERENCES psychologists_patients(psychologists_patients_id),
+    FOREIGN KEY(psychologists_id) REFERENCES psychologists(psychologists_id),
+    PRIMARY KEY(rule_id)
+);
+----------------------------
+CREATE TABLE googleApi (
+    user_id BINARY(16) NOT NULL,
+    google_refresh_token VARCHAR(255) NOT NULL UNIQUE,
+    google_scope VARCHAR(255) NOT NULL,
+    google_calendar_id VARCHAR(255),
+    FOREIGN KEY(user_id) REFERENCES users(user_id),
+    PRIMARY KEY(user_id)
+);
 
+DROP TABLE googleApi;
 
+/* DROP TRIGGER limit_scope_overlapping;
+delimiter //
+CREATE TRIGGER limit_scope_overlapping
+	BEFORE INSERT ON googleApi
+    FOR EACH ROW
+    BEGIN 
+		IF EXISTS (SELECT * FROM googleApi WHERE NEW.user_id = user_id AND NEW.google_scope = google_scope) 
+        THEN SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'ER_TOKEN_SCOPE_OVERLAPPING';
+		END IF;
+	END;
+//
+delimiter ;*/
+
+UPDATE googleApi SET google_tokens = 'jonathan' WHERE user_id = UUID_TO_BIN('da3fe20d-fc26-11ee-8cff-704d7b63e3fe');
+
+SELECT * FROM googleApi;
+----------------------------
 CREATE TABLE notifications (
 	id BINARY(16) NOT NULL,
     user_id BINARY(16) NOT NULL,
