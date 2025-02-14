@@ -1,9 +1,6 @@
 import { useContext, useState } from "react";
-import { CalendarDate } from "../components/calendars/CalendarDate"
 import { CalendarYear } from "../components/calendars/CalendarYear"
 import { CalendarMonth } from "../components/calendars/CalendarMonth"
-import { CalendarWeek } from "../components/calendars/CalendarWeek"
-import { FilledButton } from "../components/globalComponents/buttons/FilledButton"
 import { PatientContext } from "../contexts/PatientContext"
 import { toUtcMySqlDate, toUtcMySqlTime } from "../helpers/time"
 import { RuleSelector } from "../components/appointments/RuleSelector";
@@ -26,6 +23,60 @@ export const AppointmentsPage = () => {
 
     const [selectedCalendar, setSelectedCalendar] = useState(2)
 
+    const handleSync = async () => {
+        const res = await fetch("/v1/google/oauth");
+        const body = await res.json();
+
+        window.open(body.oauthUrl, '_blank').focus();
+    }
+
+    const handleCreateCalendar = async () => {
+        const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+
+        const res = await fetch("/v1/google/calendar",  options);
+        const body = await res.json();
+
+        console.log(res, body);
+    }
+
+    const handleDeleteCalendar = async () => {
+        const options = {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+
+        const res = await fetch("/v1/google/calendar",  options);
+        const body = await res.json();
+
+        console.log(res, body);
+    }
+
+    const handleGetCalendar = async () => {
+        const res = await fetch("/v1/google/calendar");
+        const body = await res.json();
+
+        console.log(res, body);
+    }
+
+    const handleRevoke = async () => {
+        const options = {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+          const res = await fetch("/v1/google/tokens", options);
+          const body = await res.json();
+          console.log(res, body);
+    }
+
     return (
         <>
             <div className="grid grid-cols-[220px_minmax(900px,_1fr)] bg-tertiary-light rounded-l-md p-4">
@@ -37,6 +88,11 @@ export const AppointmentsPage = () => {
                         <button onClick={() => setSelectedCalendar(3)} className="basis-full p-1">Año</button>
                     </div>
                     <RuleSelector />
+                    <button onClick={handleSync}>Sincronizar google</button>
+                    <button onClick={handleCreateCalendar}>Crear calendario</button>
+                    <button onClick={handleRevoke}>Revocar tokens</button>
+                    <button onClick={handleGetCalendar}>Get Calendar</button>
+                    <button onClick={handleDeleteCalendar}>Delete Calendar</button>
                 </div>
                 {
                     selectedCalendar == 0?

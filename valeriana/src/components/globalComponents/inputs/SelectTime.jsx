@@ -20,8 +20,7 @@ export const SelectTime = ({ placeholder, setter, maxHours, maxMinutes }) => {
 
   return (
     <div
-      className={`relative flex flex-wrap cursor-pointer p-1 pr-2 pl-2 ${selectionToggle ? "outline outline-1 outline-primary-base" : ""
-        }`}
+      className={`relative flex flex-wrap cursor-pointer p-1 pr-2 pl-2 ${selectionToggle ? "outline outline-1 outline-primary-base" : ""}`}
     >
       <div
         onClick={handleToggle}

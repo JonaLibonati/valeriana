@@ -1,6 +1,6 @@
 export class Cookies {
   static setCookie(cname, cvalue) {
-    document.cookie = `${cname}=${cvalue};`;
+    document.cookie = `${cname}=${cvalue}; path=/`;
   }
 
   static getCookie(cname) {

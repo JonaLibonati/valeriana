@@ -6,6 +6,8 @@ export class TokenMiddleware {
 
     console.log('validating token')
 
+    console.log(req.cookies.token)
+
     const token = validateToken(req.cookies.token);
 
     if (token.isValid) {
