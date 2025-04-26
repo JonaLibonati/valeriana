@@ -24,7 +24,7 @@ export class GoogleMiddelwares {
 			};
 
 			const data =  await GoogleModel.getCalendarId({ input })
-			req.body.google_refresh_token = data.google_calendar_id
+			req.body.google_calendar_id = data.google_calendar_id
 
 			next()
 		} catch (e) {

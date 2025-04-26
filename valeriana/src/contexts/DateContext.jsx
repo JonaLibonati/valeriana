@@ -1,15 +1,13 @@
 
 import { createContext, useRef, useState, useEffect } from "react";
+import { Temporal } from 'temporal-polyfill';
 
 export const DateContext = createContext(null);
 
 export const DateProvider = ({children}) => {
 
-    const selectedDate = useRef (new Date()); // creates a new date object with the current date and time
-    const currentDate = new Date(); // creates a new date object with the current date and time
-
-    const firstDate = new Date(); // get the first day of the month
-    const lastDate = new Date(); // get the last date of the month
+    const selectedDate = useRef (Temporal.Now.zonedDateTimeISO()); // creates a new date object with the current date and time
+    const currentDate = Temporal.Now.zonedDateTimeISO(); // creates a new date object with the current date and time
 
     const [daysInSelectedMonth, setDaysSelectedMonth] = useState([]);
 
@@ -29,15 +27,13 @@ export const DateProvider = ({children}) => {
 
         let array = [];
 
-        firstDate.setFullYear(yearNum, monthNum, 1);
+        let firstDaysMonth = Temporal.PlainDate.from({year:yearNum, month:monthNum, day:1})
 
-        lastDate.setFullYear(yearNum, monthNum+1, 0);
-
-        for (let i=firstDate.getDay(); i > 0; i--) {
+        for (let i=firstDaysMonth.dayOfWeek; i > 0; i--) {
             array.push('')
         }
 
-        for (let i=1; i <= lastDate.getDate(); i++) {
+        for (let i=1; i <= firstDaysMonth.daysInMonth; i++) {
             array.push(i)
         }
 
@@ -47,16 +43,15 @@ export const DateProvider = ({children}) => {
     const getYearDays = (yearNum) => {
         let array = [];
 
-        for (let i=0; i <= 11;i++) {
-            console.log(i)
+        for (let i=1; i <= 12;i++) {
             array.push(getMonthDays(i, yearNum))
         }
         return array
     }
 
     useEffect(() => {
-        setDaysSelectedMonth(getMonthDays(selectedDate.current.getMonth(), selectedDate.current.getFullYear()));
-        setDaysInSelectedYear(getYearDays(selectedDate.current.getFullYear()));
+        setDaysSelectedMonth(getMonthDays(selectedDate.current.month, selectedDate.current.year));
+        setDaysInSelectedYear(getYearDays(selectedDate.current.year));
     }, [dateTrigger]);
 
     return (

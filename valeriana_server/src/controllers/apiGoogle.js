@@ -2,7 +2,6 @@
 import { google } from "googleapis";
 import { GoogleModel } from "../models/apiGoogle.js";
 import { request } from 'https';
-import e from "express";
 
 const oauth2Client = new google.auth.OAuth2(
   '214861858156-sor93kn7o4dip11om8r3sv8u79afuf30.apps.googleusercontent.com',
@@ -41,16 +40,17 @@ export class GoogleController {
 		let tokens;
 
 		try {
+			console.log(req.body.code)
 			tokens = await oauth2Client.getToken(req.body.code)
-			console.log('Tokens obteined')
+			console.log('Tokens obtained')
 		} catch (e) {
 			console.log(e)
 			try {
 				if (e.response.data.error == "invalid_grant") {
-					return res.status(400).json({ code: "ER_GOOGLE_INVALID_GRANT" });
-				} else return res.status(400).json({ code: "ER_UNKNOWN_WHEN_GETTING_TOKEN" });
+					return res.status(400).json({ code: "ER_GOOGLE_INVALID_GRANT", data: e});
+				} else return res.status(400).json({ code: "ER_UNKNOWN_WHEN_GETTING_TOKEN", data: e });
 			} catch {
-				return res.status(400).json({ code: "ER_UNKNOWN_WHEN_GETTING_TOKEN" });
+				return res.status(400).json({ code: "ER_UNKNOWN_WHEN_GETTING_TOKEN", data: e });
 			}
 		}
 
@@ -62,6 +62,8 @@ export class GoogleController {
 
 		const saving_result = await DataBase.saveTokens({ input })
 
+		console.log(saving_result)
+
 		if (saving_result == 'TOKENS_SAVED') {
 			res.status(200).json({ code : 'TOKENS_SAVED'})
 		} else if (saving_result == "ER_DUP_ENTRY") {
@@ -72,7 +74,30 @@ export class GoogleController {
 				res.status(400).json({ code: "ER_UNKNOWN_WHEN_UPDATING_TOKEN", e: updating_result})
 			}
 		} else if (saving_result == "ER_BAD_NULL_ERROR") {
-			res.status(400).json({ code: "ER_BAD_NULL_ERROR" })
+			console.log({ input })
+			const DBRefreshToken = await DataBase.getTokens({ input })
+			console.log(DBRefreshToken)
+			if (DBRefreshToken.code == 'TOKEN_FOUND') {
+				let testDBRefreshToken;
+				try {
+					testDBRefreshToken = await GoogleAPI.createCalendar(DBRefreshToken.data.google_refresh_token)
+				} catch {
+					return res.status(400).json({ code: "ER_GRANT_ALREADY_OBTAINED_BUT_INVALID_REFRESH_TOKEN" })
+				}
+				console.log(testDBRefreshToken)
+				if( testDBRefreshToken.code == 'GOOGLE_CALENDAR_CREATED') {
+					const input = {
+						refresh_token: DBRefreshToken.data.google_refresh_token,
+						google_calendar_id: testDBRefreshToken.data.id
+					};
+					await GoogleAPI.deleteCalendar( {input} )
+					res.status(200).json({ code : 'GRANT_ALREADY_OBTAINED'})
+				} else if ('ER_GOOGLE_INVALID_GRANT') {
+					res.status(400).json({ code: "ER_GRANT_ALREADY_OBTAINED_BUT_INVALID_REFRESH_TOKEN" })
+				}
+			} else res.status(400).json({ code: "ER_BAD_NULL_ERROR" })
+
+			
 		} else {
 			res.status(400).json({ code: "ER_UNKNOWN_WHEN_SAVING_TOKEN", e: saving_result})
 		}
@@ -80,37 +105,7 @@ export class GoogleController {
 
 	static async revokeTokens(req, res) {
 		/* Revoke Token in data base */
-
-		let postData = "token=" + req.body.google_refresh_token;
-
-		// Options for POST request to Google's OAuth 2.0 server to revoke a token
-		let postOptions = {
-			host: 'oauth2.googleapis.com',
-			port: '443',
-			path: '/revoke',
-			method: 'POST',
-			headers: {
-			  'Content-Type': 'application/x-www-form-urlencoded',
-			  'Content-Length': Buffer.byteLength(postData)
-			}
-		  };
-
-		  // Set up the request
-		  const postReq = request(postOptions, function (res) {
-			res.setEncoding('utf8');
-			res.on('data', d => {
-			  console.log('Response: ' + d);
-			});
-		  });
-
-		  postReq.on('error', e => {
-			console.log(e)
-			req.status(400).json({e: e})
-		  });
-
-		  // Post the request with data
-		  postReq.write(postData);
-		  postReq.end();
+		await GoogleAPI.revokeTokens(req.body.google_refresh_token, res)
 	}
 
 	static async createCalendar(req, res) {
@@ -129,11 +124,11 @@ export class GoogleController {
 			console.log(check_calendar_access)
 
 			if (check_calendar_access.code == 'GOOGLE_CALENDAR_FOUND_AND_GRANTED') {
-				res.status(200).json({code: 'GOOGLE_CALENDAR_ALREADY_CREATED', google_data: check_calendar_access.data, db_data: check_calendar_db.data})
+				return res.status(200).json({code: 'GOOGLE_CALENDAR_ALREADY_CREATED', google_data: check_calendar_access.data, db_data: check_calendar_db.data})
 			}
 		}
 
-		/* const res_google = await GoogleAPI.createCalendar(req.body.google_refresh_token)
+		const res_google = await GoogleAPI.createCalendar(req.body.google_refresh_token)
 
 		if (res_google.code == "GOOGLE_CALENDAR_CREATED") {
 
@@ -146,59 +141,87 @@ export class GoogleController {
 				res.status(400).json({code: 'ER_GOOGLE_CALENDAR_CREATED_BUT_ID_NOT_SAVED', google_data: res_google.data, db_data: res_database.data})
 			}
 		} else {
-			res.status(400).json({code, data})
-		} */
+			res.status(400).json({code: 'ER_GOOGLE_WHEN_CREATING_CALENDAR', google_data: res_google.data})
+		}
 	}
 
 	static async getCalendar(req, res) {
 
-		try {
+		const input = {
+			user_id: req.body.payload.user_id,
+			refresh_token: req.body.google_refresh_token,
+			google_calendar_id: req.body.google_calendar_id
+		};
 
-			oauth2Client.setCredentials({refresh_token : req.body.google_refresh_token});
+		console.log(input)
 
-			const result = await calendar.calendars.get({
-				auth: oauth2Client,
-				calendarId: req.body.google_calendar_id,});
+		const {code, data} = await GoogleAPI.getCalendar({ input })
 
-			console.log(result.data)
-			res.status(200).json(result.data)
-		} catch (e) {
-			try {
-				if (e.response.data.error == "invalid_grant") {
-					res.status(400).json({code : 'ER_GOOGLE_INVALID_GRANT', e})
-				} else if (e.status == 404) {
-					res.status(404).json({code : 'ER_GOOGLE_CALENDAR_NOT_FOUND', e})
-				} else res.status(400).json({code : 'ER_UNKNOWN_WHEN_DELETING_GOOGLE_CALENDAR', e})
-			} catch {
-				res.status(400).json({code : 'ER_UNKNOWN_WHEN_DELETING_GOOGLE_CALENDAR', e})
-			}
+		console.log(data)
+
+		if (code == "GOOGLE_CALENDAR_FOUND_AND_GRANTED") {
+			res.status(200).json({code, data})
+		} else if (code == 'ER_GOOGLE_INVALID_GRANT') {
+			res.status(400).json({code, data})
+		} else if (code == "ER_GOOGLE_CALENDAR_NOT_FOUND") {
+			res.status(404).json({code, data})
+		} else if (code == "ER_UNKNOWN_WHEN_GETTING_GOOGLE_CALENDAR") {
+			res.status(400).json({code, data})
 		}
 	}
 
 	static async deleteCalendar(req, res) {
+
+		const input = {
+			refresh_token: req.body.google_refresh_token,
+			google_calendar_id: req.body.google_calendar_id
+		};
+
+		console.log(input)
+
+		const {code, data} = await GoogleAPI.deleteCalendar({ input })
+
+		console.log(data)
+
+		if (code == "GOOGLE_CALENDAR_DELETED") {
+			res.status(200).json({code, data})
+		} else if ('ER_GOOGLE_INVALID_GRANT') {
+			res.status(400).json({code, data})
+		} else if ('ER_GOOGLE_CALENDAR_NOT_FOUND') {
+			res.status(404).json({code, data})
+		} else res.status(400).json({code, data})
+	}
+
+	static async setCalendarIsSync (req, res) {
+		const input = {
+			user_id: req.body.payload.user_id,
+			google_calendar_is_sync: req.body.google_calendar_is_sync
+		};
+
+		console.log(input)
+
 		try {
-
-			oauth2Client.setCredentials({refresh_token : req.body.google_refresh_token});
-
-			const result = await calendar.calendars.delete({
-				auth: oauth2Client,
-				calendarId: "0c7ed3989072933807266315e745d32d810d1ef6bdbe8cf264246f7642c8ea6d@group.calendar.google.com",});
-
-			console.log(result.data)
-			res.status(200).json(result.data)
+			const data =  await GoogleModel.setCalendarIsSync({ input })
+			res.status(200).json({data})
 		} catch (e) {
-			try {
-				if (e.response.data.error == "invalid_grant") {
-					res.status(400).json({code : 'ER_GOOGLE_INVALID_GRANT', e})
-				} else if (e.status == 404) {
-					res.status(404).json({code : 'ER_GOOGLE_CALENDAR_NOT_FOUND', e})
-				} else res.status(400).json({code : 'ER_UNKNOWN_WHEN_DELETING_GOOGLE_CALENDAR', e})
-			} catch {
-				res.status(400).json({code : 'ER_UNKNOWN_WHEN_DELETING_GOOGLE_CALENDAR', e})
-			}
+			console.log(e)
+			res.status(400).json({e})
 		}
 	}
 
+	static async getCalendarIsSync (req, res) {
+
+		const input = {
+			user_id: req.body.payload.user_id,
+		};
+
+		try {
+			const data =  await GoogleModel.getCalendarIsSync({ input })
+			res.status(200).json({data})
+		} catch (e) {
+			res.status(400).json({e})
+		}
+	}
 }
 
 class DataBase {
@@ -210,6 +233,8 @@ class DataBase {
 		} catch (e) {
 			if (e.code === "ER_DUP_ENTRY") {
 				return "ER_DUP_ENTRY";
+			} else if(e.code == 'ER_BAD_NULL_ERROR') {
+				return "ER_BAD_NULL_ERROR";
 			} else {
 				return e;
 			};
@@ -224,6 +249,17 @@ class DataBase {
 		} catch (e) {
 			return e;
 		};
+	}
+
+	static async getTokens ({ input }) {
+		try {
+			const data = await GoogleModel.getTokens({ input });
+
+			return {code: 'TOKEN_FOUND', data: data}
+		} catch (e) {
+			console.error(e);
+			return {code: 'TOKEN_NOT_FOUND', data: e}
+		}
 	}
 
 	static async updateCalendar ({ input }) {
@@ -272,6 +308,77 @@ class GoogleAPI {
 				return {code: "ER_UNKNOWN_WHEN_CREATING_GOOGLE_CALENDAR", data: e}
 			}
 		}
+	}
+
+	static async deleteCalendar({ input }) {
+
+		const { refresh_token, google_calendar_id } = input
+
+		try {
+
+			oauth2Client.setCredentials({refresh_token});
+
+			const result = await calendar.calendars.delete({
+				auth: oauth2Client,
+				calendarId: google_calendar_id,});
+
+			console.log(result.data)
+
+			return { code: 'GOOGLE_CALENDAR_DELETED', data: result.data}
+		} catch (e) {
+			try {
+				if (e.response.data.error == "invalid_grant") {
+					return {code : 'ER_GOOGLE_INVALID_GRANT', e}
+				} else if (e.status == 404) {
+					return {code : 'ER_GOOGLE_CALENDAR_NOT_FOUND', e}
+				} else return {code : 'ER_UNKNOWN_WHEN_DELETING_GOOGLE_CALENDAR', e}
+			} catch {
+				return {code : 'ER_UNKNOWN_WHEN_DELETING_GOOGLE_CALENDAR', e}
+			}
+		}
+	}
+
+	static async revokeTokens( token, res ) {
+		/* Revoke Token in data base */
+
+		let code;
+		let data;
+
+		let postData = "token=" + token;
+
+		// Options for POST request to Google's OAuth 2.0 server to revoke a token
+		let postOptions = {
+			host: 'oauth2.googleapis.com',
+			port: '443',
+			path: '/revoke',
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/x-www-form-urlencoded',
+			  'Content-Length': Buffer.byteLength(postData)
+			}
+		  };
+
+		  // Set up the request
+		  const postReq = request(postOptions, function (response) {
+			response.setEncoding('utf8');
+			response.on('data', d => {
+				console.log('Response: ' + d);
+				data = JSON.parse(d)
+			  	if (data.error === undefined) {
+					res.status(200).json({code: 'GOOGLE_TOKEN_REVOKED', data})
+				} else res.status(400).json({code: 'ER_GOOGLE_WHEN_REVOKING_TOKEN', data})
+			});
+
+		  });
+
+		  postReq.on('error', e => {
+			console.log(e)
+			res.status(400).json({code: 'ER_GOOGLE_WHEN_REVOKING_TOKEN', data:e})
+		  });
+
+		  // Post the request with data
+			postReq.write(postData);
+			postReq.end();
 	}
 
 	static async getCalendar( { input } ) {

@@ -6,20 +6,20 @@ export const YearSeletor = ({className}) => {
     const { selectedDate, setYearSelector, setDateTrigger, setYearTrigger } = useContext(DateContext)
 
     const handleClickAdd = () => {
-        selectedDate.current.setFullYear(selectedDate.current.getFullYear() + 1);
-        setYear(selectedDate.current.getFullYear())
-        setDateTrigger(selectedDate.current.getFullYear())
-        setYearTrigger(selectedDate.current.getFullYear())
+        selectedDate.current = selectedDate.current.add({years: 1});
+        setYear(selectedDate.current.year)
+        setDateTrigger(selectedDate.current.year)
+        setYearTrigger(selectedDate.current.year)
     }
 
     const handleClickSubtract = () => {
-        selectedDate.current.setFullYear(selectedDate.current.getFullYear() - 1);
-        setYear(selectedDate.current.getFullYear())
-        setDateTrigger(selectedDate.current.getFullYear())
-        setYearTrigger(selectedDate.current.getFullYear())
+        selectedDate.current = selectedDate.current.subtract({years: 1});
+        setYear(selectedDate.current.year)
+        setDateTrigger(selectedDate.current.year)
+        setYearTrigger(selectedDate.current.year)
     }
 
-    const [year, setYear] = useState(selectedDate.current.getFullYear());
+    const [year, setYear] = useState(selectedDate.current.year);
 
     return (
         <div className={`flex size-full text-2xl ${className}`}>

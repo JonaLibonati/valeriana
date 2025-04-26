@@ -11,16 +11,6 @@ const config = {
 
 const connection = await mysql.createConnection(config);
 
-connection.on('connection', connection => {
-  console.log("Time zone setted")
-  connection.query('SET time_zone="+00:00"', e => {
-    if (e) {
-      console.log(e)
-      return
-    }
-  })
-});
-
 export class MeetingsModel {
   static async create({ input }) {
     const { meeting_start_time, meeting_duration, psychologist_patient_id } = input;
@@ -31,7 +21,7 @@ export class MeetingsModel {
       [meeting_start_time, meeting_duration, psychologist_patient_id]
     );
 
-    const list = await this.getMeetingsListByPsychologistsPatients({ input });
+    const list = await this.getMeetingsList({ input });
 
     return list;
   }
@@ -65,15 +55,15 @@ export class MeetingsModel {
   }
 
   static async getMeetingsList({ input }) {
-    const { psychologist_id } = input;
+    const { user_id } = input;
 
     const [list] = await connection.query(
       `SELECT BIN_TO_UUID(meeting_id) meeting_id, BIN_TO_UUID(meetings.psychologist_patient_id) psychologist_patient_id, BIN_TO_UUID(psychologist_id) psychologist_id, BIN_TO_UUID(patient_id) patient_id, meeting_start_time, meeting_end_time, meeting_duration
         FROM meetings
         INNER JOIN psychologists_patients ON psychologists_patients.psychologist_patient_id = meetings.psychologist_patient_id
-        WHERE psychologist_id = UUID_TO_BIN(?)
+        WHERE psychologist_id = UUID_TO_BIN(?) OR patient_id = UUID_TO_BIN(?)
         ORDER BY psychologist_patient_id, meeting_start_time;`,
-      [psychologist_id]
+      [user_id, user_id]
     );
 
     console.log(list);
@@ -94,12 +84,4 @@ export class MeetingsModel {
 
     return res[0];
   }
-}
-
-export class PsychologistsMeetingModel {
- 
-}
-
-export class PatientsMeetingModel {
- 
 }

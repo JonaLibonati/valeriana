@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 
-export const Select = ({placeholder, setter, elements, className, children}) => {
+export const SelectFromList = ({placeholder, setter, elements, className, children}) => {
 
     const [classFather, classSelection, classElements, classElement, ClassOnFatherSelection] = className ? className : [];
   
@@ -22,7 +22,7 @@ export const Select = ({placeholder, setter, elements, className, children}) => 
         {children}
         <div className={`${classElements? classElements : ''} flex flex-wrap`}>
           {elements.map((element) =>
-            <div className={`${classElement? classElement : ''}`} onClick={() => setSelection(element)}>{element[0]}</div>
+            <div className={`${classElement? classElement : ''}`} onClick={() => setSelection(element)}>{element}</div>
           )}
         </div>
       </> : <></>
@@ -30,7 +30,7 @@ export const Select = ({placeholder, setter, elements, className, children}) => 
 
       {selection && !selectionToggle?
       <>
-        <div className={`${classSelection? classSelection : ''}`}>{selection[0]}</div>
+        <div className={`${classSelection? classSelection : ''}`}>{selection}</div>
       </> : <></>
       }
     </div>

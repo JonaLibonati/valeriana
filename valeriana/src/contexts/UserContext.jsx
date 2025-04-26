@@ -1,6 +1,7 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { SelfUser } from "../api/selfUser";
 import { validateFirstName, validateLastName, validateNewEmail, validateUserName } from "../schemes/userSchema";
+import { Temporal } from "temporal-polyfill";
 
 export const UserContext = createContext(null);
 
@@ -15,8 +16,23 @@ export const UserProvider = ({ children }) => {
   const roleId = useRef('');
   const role = useRef('');
 
+  const [lang, setLang] = useState('es');
+  const [theme, setTheme] = useState('');
+  const [calendarLocale, setCalendarLocale] = useState(navigator.language);
+  const [calendarTimeZone, setCalendarTimeZone] = useState(Temporal.Now.zonedDateTimeISO().timeZoneId);
+
+  console.log(lang, calendarLocale, calendarTimeZone)
+
+  const config = {
+    lang,
+    theme,
+    calendarLocale,
+    calendarTimeZone
+  }
+
   const user = {
     data: userData,
+    config,
     roleId,
     role,
     setUserName,
@@ -216,9 +232,11 @@ export const UserProvider = ({ children }) => {
         setIsLoadingEmail(false);
       }
     }
+  }
 
-    static async handleNewPassword(e, { setters }) {
-
+  class Config {
+    static async hola() {
+      console.log('hola')
     }
   }
 

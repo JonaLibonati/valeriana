@@ -52,13 +52,13 @@ export const PatientProvider = ({ children }) => {
         .catch((e) => console.error(e));
     }
 
-    static async handleCreateMeeting(e, meetingData) {
+    static async handleCreateMeeting(meetingData) {
       meeting.create(meetingData)
         .then(({ res, body }) => {
           if (res.status === 201) {
-            setMyMeetings(body);
+            setMyMeetings(body.meetingsList);
           }
-          else console.error(res);
+          else console.error(res, body);
         })
         .catch((e) => console.error(e));
     }
@@ -85,7 +85,7 @@ export const PatientProvider = ({ children }) => {
       meeting.getMeetingList().then(({ res, body }) => {
         if (res.status === 200) {
           console.log(body)
-          setMyMeetings(body);
+          setMyMeetings(body.meetingsList);
         } else console.error(res);
       });
 

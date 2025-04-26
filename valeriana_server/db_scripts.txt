@@ -31,6 +31,7 @@ ALTER TABLE users
 ADD CONSTRAINT foreign_role_key
 FOREIGN KEY (user_roleId) REFERENCES roles(role_id);
 
+
 SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, user_password, email_address, email_isValidated, first_name, last_name, created_at FROM users;
 
 SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, role_name, user_password, email_address, email_isValidated, first_name, last_name, created_at FROM users
@@ -80,9 +81,12 @@ DROP TABLE roles;
 CREATE TABLE roles (
 	role_id INT NOT NULL AUTO_INCREMENT,
     role_name VARCHAR(50) NOT NULL UNIQUE,
-    FOREIGN KEY(role_id) REFERENCES users(user_roleId),
 	PRIMARY KEY(role_id)
 );
+
+ALTER TABLE roles
+ADD CONSTRAINT foreign_user_role_key
+FOREIGN KEY(role_id) REFERENCES users(user_roleId);
 
 INSERT INTO roles (role_name) VALUES ('admin'), ('patient'), ('psychologist'), ('doctor');
 ----------------------------
@@ -193,6 +197,7 @@ CREATE TABLE googleApi (
     google_refresh_token VARCHAR(255) NOT NULL UNIQUE,
     google_scope VARCHAR(255) NOT NULL,
     google_calendar_id VARCHAR(255),
+    google_calendar_is_sync BOOLEAN NOT NULL DEFAULT (0),
     FOREIGN KEY(user_id) REFERENCES users(user_id),
     PRIMARY KEY(user_id)
 );
@@ -213,7 +218,7 @@ CREATE TRIGGER limit_scope_overlapping
 //
 delimiter ;*/
 
-UPDATE googleApi SET google_tokens = 'jonathan' WHERE user_id = UUID_TO_BIN('da3fe20d-fc26-11ee-8cff-704d7b63e3fe');
+UPDATE googleApi SET google_refresh_token = 'jonathan' WHERE user_id = UUID_TO_BIN('15c58424-e55f-11ef-b6f2-79a7da4df4df');
 
 SELECT * FROM googleApi;
 ----------------------------
@@ -225,23 +230,24 @@ CREATE TABLE notifications (
     PRIMARY KEY(id)
 );
 
-DELETE FROM users WHERE user_id = UUID_TO_BIN('20a311b3-f21a-11ee-82c8-704d7b63e3fe');
+----------------------------
+CREATE TABLE config (
+	user_id BINARY(16) NOT NULL,
+    general_lang VARCHAR(2),
+    general_theme VARCHAR(255),
+    calendar_locale VARCHAR(5),
+    calendar_time_zone VARCHAR(5),
+    calendar_time_zones_list VARCHAR(8000),
+    FOREIGN KEY(user_id) REFERENCES users(user_id),
+    PRIMARY KEY(user_id)
+);
 
-INSERT INTO users (user_name, user_roleId, user_password, email_address, first_name, last_name)
-VALUES
-('digital', '2','$2b$10$wPEWsw8T0M47UtMigExrneS4I0tGRE1rl0pdF93e3e5nNmrqoeRGe', 'jona@gmail.com', 'Jonathan', 'Libonati');
+INSERT INTO config (user_id) VALUES(UUID_TO_BIN('84db350e-ef0d-11ef-b6f2-79a7da4df4df'));
 
-SELECT * FROM users WHERE user_id = UUID_TO_BIN('3cd8b37a-f216-11ee-82c8-704d7b63e3fe');
-SELECT * FROM roles;
-SELECT * FROM users;
+SELECT BIN_TO_UUID(config.user_id) user_id, user_name, general_lang, general_theme, calendar_locale, calendar_time_zone, calendar_time_zones_list
+        FROM config
+        INNER JOIN users ON users.user_id = config.user_id
+        WHERE config.user_id = UUID_TO_BIN('84db350e-ef0d-11ef-b6f2-79a7da4df4df');
 
-SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, email_address, email_isValidated, first_name, last_name FROM users WHERE user_name = 'digital';
+DROP TABLE config;
 
-SELECT * FROM users INNER JOIN roles ON users.user_roleId = roles.role_id;
-
-DELETE FROM users WHERE user_id = UUID_TO_BIN('8d38b3bf-f218-11ee-82c8-704d7b63e3fe');
-
-SELECT email_isValidated FROM users WHERE user_id = UUID_TO_BIN('66db2bc9-f396-11ee-82c8-704d7b63e3fe');
-
-UPDATE users SET email_isValidated = 0 WHERE user_id = UUID_TO_BIN('fffa077e-f6d5-11ee-9a3e-704d7b63e3fe');
-UPDATE users SET first_name = 'jonathan' WHERE user_id = UUID_TO_BIN('da3fe20d-fc26-11ee-8cff-704d7b63e3fe');SELECT * FROM roles;

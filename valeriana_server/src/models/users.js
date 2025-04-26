@@ -100,6 +100,8 @@ export class UserModel {
     static async getUser ({ input }) {
         const { user_id } = input;
 
+        console.log("hola" + user_id)
+
         const [user] = await connection.query (
             `SELECT BIN_TO_UUID(user_id) user_id, user_name, user_roleId, role_name, email_address, email_isValidated, first_name, last_name, created_at FROM users INNER JOIN roles ON users.user_roleId = roles.role_id WHERE user_id = UUID_TO_BIN(?);`, [user_id]
         );

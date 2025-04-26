@@ -17,6 +17,7 @@ export const SearcherBar = ({ placeholder, handleSubmit }) => {
         type="text"
         id="searcher"
         placeholder={`Buscar ${placeholder}`}
+        onChange={handleSubmit}
       />
     </form>
   );

@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { contactsRouter } from "./routes/v1/contacts.js";
 import { meetingsRouter } from "./routes/v1/meetings.js";
 import { googleRouter } from "./routes/v1/apiGoogle.js";
+import { configRouter } from "./routes/v1/config.js";
 
 // Reading a JSON with ESM.
 // import { createRequire } from 'node:module';
@@ -32,6 +33,7 @@ app.use("/v1/users", usersRouter);
 app.use("/v1/contacts", contactsRouter);
 app.use("/v1/meeting", meetingsRouter);
 app.use("/v1/google", googleRouter);
+app.use("/v1/config", configRouter);
 
 app.use((req, res) => {
     res.status(404).send("Error 404. Page not found");

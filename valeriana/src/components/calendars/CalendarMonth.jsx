@@ -30,13 +30,13 @@ export const CalendarMonth = () => {
                             { dayAbbr.map( (text) => <Day text={text}/> ) }
                             { daysInSelectedMonth.map( (day, i) =>
                             <>
-                            <div className='h-[200px] border border-secondary-light p-1'>
-                                <DateNumber text={day} font={'text-xs'} day={day} month={selectedDate.current.getMonth()} year={selectedDate.current.getFullYear()} i={i} key={i}/>
+                            <div className='h-[200px] border border-secondary-light p-1 overflow-scroll'>
+                                <DateNumber text={day} font={'text-xs'} day={day} month={selectedDate.current.month} year={selectedDate.current.year} i={i} key={i}/>
                                 {myMeetings.map( (meeting) => {
                                     const meetingDate = toDate(meeting.meeting_start_time)
-                                    if (meetingDate.getDate() == day && meetingDate.getMonth() == selectedDate.current.getMonth() && meetingDate.getFullYear() == selectedDate.current.getFullYear()) {
+                                    if (meetingDate.day == day && meetingDate.month == selectedDate.current.month && meetingDate.year == selectedDate.current.year) {
                                         const patient_name = PatientsHelpers.findPatientByID(meeting.patient_id).user_name
-                                        return <BulletEvent text={`${patient_name} - ${meetingDate.getHours().toString().padStart(2, '0')}:${meetingDate.getMinutes().toString().padStart(2, '0')}`}/>
+                                        return <BulletEvent text={`${patient_name} - ${meetingDate.hour.toString().padStart(2, '0')}:${meetingDate.minute.toString().padStart(2, '0')}`}/>
                                     }
                                 }
                             )}

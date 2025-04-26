@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { ChevronDownIcon } from "../icons/ChevronDownIcon";
 import { SelectNumberUpDown } from "./SelectNumberUpDown";
 
-export const SelectTime = ({ placeholder, setter, maxHours, maxMinutes }) => {
+export const SelectTime = ({ placeholder, setter, maxHours, maxMinutes, initialHour, initialMinutes }) => {
   const [selection, setSelection] = setter;
 
-  const [hour, setHour] = useState(12);
-  const [min, setMin] = useState(0);
+  const [hour, setHour] = useState(initialHour);
+  const [min, setMin] = useState(initialMinutes);
   const [selectionToggle, setSelectionToggle] = useState(false);
 
   const handleToggle = () => {
@@ -53,7 +53,7 @@ export const SelectTime = ({ placeholder, setter, maxHours, maxMinutes }) => {
 
       {selection && !selectionToggle ?
         <>
-          <div className='p-2 pt-1 pb-1 ml-2 mt-1 bg-secondary-light rounded-md'>{`${selection[0]} : ${selection[1].toString().padStart(2, '0')}`}</div>
+          <div className='p-2 pt-1 pb-1 ml-2 mt-1 bg-secondary-light rounded-md'>{`${selection[0].toString().padStart(2, '0')} : ${selection[1].toString().padStart(2, '0')}`}</div>
         </> : <></>
       }
     </div>

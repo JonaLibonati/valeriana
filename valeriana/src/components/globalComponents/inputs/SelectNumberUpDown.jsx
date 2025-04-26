@@ -22,7 +22,7 @@ export const SelectNumberUpDown = ({ setter, max, min }) => {
       <div className="p-1" onClick={handleClickUp}>
         <ChevronUpIcon />
       </div>
-      <div className="text-xl">{selection}</div>
+      <div className="text-xl">{selection.toString().padStart(2, '0')}</div>
       <div className="p-1" onClick={handleClickDown}>
         <ChevronDownIcon />
       </div>

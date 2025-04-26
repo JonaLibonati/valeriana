@@ -68,4 +68,26 @@ export class GoogleModel {
 
     return this.getCalendarId({ input });
   }
+
+  static async getCalendarIsSync ({ input }) {
+
+    const { user_id } = input;
+
+    const [user] = await connection.query (
+      `SELECT BIN_TO_UUID(user_id) user_id, google_calendar_is_sync FROM googleApi WHERE user_id = UUID_TO_BIN(?);`, [user_id]
+    );
+
+    return user[0];
+  }
+
+  static async setCalendarIsSync ({ input }) {
+
+    const { user_id, google_calendar_is_sync } = input;
+
+    await connection.query(
+        'UPDATE googleApi SET google_calendar_is_sync = ? WHERE user_id = UUID_TO_BIN(?);', [google_calendar_is_sync, user_id]
+    );
+
+    return this.getCalendarIsSync({ input });
+  }
 }

@@ -1,7 +1,5 @@
 import {
   MeetingsModel,
-  PatientsMeetingModel,
-  PsychologistsMeetingModel
 } from "../models/meetings.js";
 
 export class MeetingController {
@@ -11,14 +9,17 @@ export class MeetingController {
         meeting_start_time: req.body.meeting_start_time,
         meeting_duration: req.body.meeting_duration,
         psychologist_patient_id: req.body.psychologist_patient_id,
+        user_id: req.body.payload.user_id,
       };
       const meetingsList = await MeetingsModel.create({ input });
-      res.status(201).json({ meetingsList: meetingsList });
+      res.status(201).json({ meetingsList });
     } catch (e) {
       console.error(e);
       if (e.code === "ER_DUP_ENTRY") {
         res.status(400).json({ code: "ER_DUP_ENTRY" });
-      } else res.status(400).send();
+      } else if (e.sqlMessage === "ER_MEETING_OVERLAPPING") {
+        res.status(400).json({ code: "ER_MEETING_OVERLAPPING" });
+      } else res.status(400);
     }
   }
 
@@ -28,25 +29,25 @@ export class MeetingController {
         meeting_id: req.body.meeting_id,
       };
       const meetingsList = await MeetingsModel.delete({ input });
-      res.status(201).json({ meetingsList: meetingsList });
+      res.status(201).json({meetingsList});
     } catch (e) {
       console.error(e);
-      res.status(400).send();
+      res.status(400);
     }
   }
 
   static async getContactList(req, res) {
     try {
       const input = {
-        psychologist_id: req.body.payload.user_id,
+        user_id: req.body.payload.user_id,
       };
       const meetingsList = await MeetingsModel.getMeetingsList({
         input,
       });
-      res.status(200).json({ meetingsList: meetingsList });
+      res.status(200).json({ meetingsList });
     } catch (e) {
       console.error(e);
-      res.status(400).send();
+      res.status(400);
     }
   }
 }

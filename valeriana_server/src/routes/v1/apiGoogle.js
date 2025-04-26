@@ -14,4 +14,7 @@ googleRouter.delete ('/tokens', TokenMiddleware.validate, UserMiddelwares.isEmai
 
 googleRouter.get ('/calendar', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, GoogleMiddelwares.getTokens, GoogleMiddelwares.getCalendarId, GoogleController.getCalendar);
 googleRouter.post ('/calendar', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, GoogleMiddelwares.getTokens, GoogleController.createCalendar);
-googleRouter.delete ('/calendar', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, GoogleMiddelwares.getTokens, GoogleController.deleteCalendar);
+googleRouter.delete ('/calendar', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, GoogleMiddelwares.getTokens, GoogleMiddelwares.getCalendarId, GoogleController.deleteCalendar);
+
+googleRouter.get ('/calendar/isSync', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, GoogleController.getCalendarIsSync);
+googleRouter.post ('/calendar/isSync', TokenMiddleware.validate, UserMiddelwares.isEmailValidated, GoogleController.setCalendarIsSync);

@@ -1,81 +1,25 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CalendarYear } from "../components/calendars/CalendarYear"
 import { CalendarMonth } from "../components/calendars/CalendarMonth"
-import { PatientContext } from "../contexts/PatientContext"
-import { toUtcMySqlDate, toUtcMySqlTime } from "../helpers/time"
 import { RuleSelector } from "../components/appointments/RuleSelector";
+import { google } from "../api/google";
+import { OutlineButton } from "../components/globalComponents/buttons/OutlineButton";
+import { GoogleCalendarIcon } from "../components/globalComponents/icons/GoogleCalendarIcon"
 
 export const AppointmentsPage = () => {
 
-    const { myPatients, myMeetings, PatientsHelpers } = useContext(PatientContext);
+    const [isGoogleSync, setisGoogleSync] = useState(false);
 
-    const handleClick = (e) => {
-        const exampleDate = new Date (2025, 0, 15, 10, 0, 0)
-        const meetingData = {
-            psychologist_patient_id: myPatients[0].psychologist_patient_id,
-            meeting_start_time: toUtcMySqlDate(exampleDate),
-            meeting_duration: toUtcMySqlTime(90)
-        }
-        PatientsHelpers.handleCreateMeeting(e, meetingData)
-        console.log(toUtcMySqlDate(exampleDate))
-        console.log(toUtcMySqlTime(90))
-    }
+    useEffect(() => {
+        google.isCalendarSync()
+        .then(({body}) => {
+            setisGoogleSync(body.data.google_calendar_is_sync)
+        }).catch((error) => {
+            console.error(error);
+        });
+    }, [])
 
-    const [selectedCalendar, setSelectedCalendar] = useState(2)
-
-    const handleSync = async () => {
-        const res = await fetch("/v1/google/oauth");
-        const body = await res.json();
-
-        window.open(body.oauthUrl, '_blank').focus();
-    }
-
-    const handleCreateCalendar = async () => {
-        const options = {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          };
-
-        const res = await fetch("/v1/google/calendar",  options);
-        const body = await res.json();
-
-        console.log(res, body);
-    }
-
-    const handleDeleteCalendar = async () => {
-        const options = {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          };
-
-        const res = await fetch("/v1/google/calendar",  options);
-        const body = await res.json();
-
-        console.log(res, body);
-    }
-
-    const handleGetCalendar = async () => {
-        const res = await fetch("/v1/google/calendar");
-        const body = await res.json();
-
-        console.log(res, body);
-    }
-
-    const handleRevoke = async () => {
-        const options = {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          };
-          const res = await fetch("/v1/google/tokens", options);
-          const body = await res.json();
-          console.log(res, body);
-    }
+    const [selectedCalendar, setSelectedCalendar] = useState(2);
 
     return (
         <>
@@ -88,11 +32,20 @@ export const AppointmentsPage = () => {
                         <button onClick={() => setSelectedCalendar(3)} className="basis-full p-1">Año</button>
                     </div>
                     <RuleSelector />
-                    <button onClick={handleSync}>Sincronizar google</button>
-                    <button onClick={handleCreateCalendar}>Crear calendario</button>
-                    <button onClick={handleRevoke}>Revocar tokens</button>
-                    <button onClick={handleGetCalendar}>Get Calendar</button>
-                    <button onClick={handleDeleteCalendar}>Delete Calendar</button>
+                    {isGoogleSync?
+                        <div className="grid content-center w-full p-4 pt-1 pb-1 mt-1 mb-1 rounded-md text-tertiary-dark outline outline-green-500">
+                            <div className="flex">
+                                <GoogleCalendarIcon className={'size-12 mr-2'} />
+                                Google calendar Sincronizado
+                            </div>
+                        </div> :
+                        <OutlineButton>
+                            <div className="flex" onClick={google.syncCalendar}>
+                                <GoogleCalendarIcon className={'mr-2'} />
+                                Sincronizar Google Calendar
+                            </div>
+                        </OutlineButton>
+                    }
                 </div>
                 {
                     selectedCalendar == 0?

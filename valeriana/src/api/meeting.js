@@ -10,7 +10,7 @@ export class meeting {
     const res = await fetch("/v1/meeting", options);
     const body = await res.json();
 
-    return { res, body: body.meetingsList };
+    return { res, body };
   }
 
   static async delete(meetingData) {
@@ -25,13 +25,13 @@ export class meeting {
     const res = await fetch("/v1/meeting", options);
     const body = await res.json();
 
-    return { res, body: body.meetingsList };
+    return { res, body };
   }
 
   static async getMeetingList() {
     const res = await fetch("/v1/meeting");
     const body = await res.json();
 
-    return { res, body: body.meetingsList };
+    return { res, body };
   }
 }
