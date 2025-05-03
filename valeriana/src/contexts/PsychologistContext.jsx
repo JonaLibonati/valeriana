@@ -1,13 +1,13 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect } from "react";
 import { ContactPsychologist } from "../api/contact";
-import { UserContext } from "./UserContext";
+import { useData } from "./DataContext";
 
 
 export const PsychologistContext = createContext(null);
 
 export const PsychologistProvider = ({ children }) => {
 
-  const { user } = useContext(UserContext);
+  const { user } = useData();
 
   const [myPsychologist, setMyPsychologist] = useState([]);
 
@@ -33,14 +33,14 @@ export const PsychologistProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if ( user.role.current == 'patient') {
+    if ( user.role_name == 'patient') {
       ContactPsychologist.getContactList().then(({ res, body }) => {
         console.log(body)
         if (res.status === 200) setMyPsychologist(body);
         else console.error(res);
       });
     }
-  }, [user.role.current]);
+  }, []);
 
   return (
     <PsychologistContext.Provider value={{

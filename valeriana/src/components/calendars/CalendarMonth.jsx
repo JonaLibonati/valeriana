@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Day } from './subcomponents/Day';
-import { DateContext } from '../../contexts/DateContext';
+import { useDate } from '../../contexts/DateContext';
 import { YearSeletor } from './subcomponents/YearSeletor';
 import { DateNumber } from './subcomponents/DateNumber';
 import { MonthSeletorCarruselType } from './subcomponents/MonthSeletorCarruselType';
@@ -9,9 +9,9 @@ import { BulletEvent } from './subcomponents/BulletEvent';
 import { PatientContext } from '../../contexts/PatientContext';
 
 
-export const CalendarMonth = () => {
+export const CalendarMonth = ({timeZone}) => {
 
-    const { daysInSelectedMonth, selectedDate } = useContext(DateContext);
+    const { daysInSelectedMonth, selectedDateRef } = useDate();
 
     const { myMeetings, myPatients, PatientsHelpers } = useContext(PatientContext);
 
@@ -31,10 +31,10 @@ export const CalendarMonth = () => {
                             { daysInSelectedMonth.map( (day, i) =>
                             <>
                             <div className='h-[200px] border border-secondary-light p-1 overflow-scroll'>
-                                <DateNumber text={day} font={'text-xs'} day={day} month={selectedDate.current.month} year={selectedDate.current.year} i={i} key={i}/>
+                                <DateNumber text={day} font={'text-xs'} day={day} month={selectedDateRef.current.month} year={selectedDateRef.current.year} timeZone={timeZone} i={i} key={i}/>
                                 {myMeetings.map( (meeting) => {
-                                    const meetingDate = toDate(meeting.meeting_start_time)
-                                    if (meetingDate.day == day && meetingDate.month == selectedDate.current.month && meetingDate.year == selectedDate.current.year) {
+                                    const meetingDate = toDate(meeting.meeting_start_time, timeZone)
+                                    if (meetingDate.day == day && meetingDate.month == selectedDateRef.current.month && meetingDate.year == selectedDateRef.current.year) {
                                         const patient_name = PatientsHelpers.findPatientByID(meeting.patient_id).user_name
                                         return <BulletEvent text={`${patient_name} - ${meetingDate.hour.toString().padStart(2, '0')}:${meetingDate.minute.toString().padStart(2, '0')}`}/>
                                     }

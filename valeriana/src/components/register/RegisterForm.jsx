@@ -1,21 +1,17 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import { Loading } from "../globalComponents/loading/Loading";
 import { Input } from "../globalComponents/input/Input";
 import { FilledButton } from "../globalComponents/buttons/FilledButton";
 import { GoBackButton } from "../globalComponents/buttons/GoBackButton";
-import { RegisterHelpers } from "../../helpers/registerHelpers";
-import { PopUpContext } from "../../contexts/PopUpContext";
+import { registerInputList, useLogin } from "../../contexts/LoginContext";
 
-export const RegisterForm = ({ roleId, setRoleId, setUserIsCreated }) => {
-  const { usePopUp } = useContext(PopUpContext);
+export const RegisterForm = ({ roleId, setRoleId }) => {
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { handleCreateNewUser, isLoading } = useLogin()
 
-  const handleSubmit = (e) => {
-    const setters = { usePopUp, setIsLoading, setUserIsCreated };
-    RegisterHelpers.handleSubmit(e, {
+  const handleSubmit = async (e) => {
+    await handleCreateNewUser(e, {
       roleId,
-      setters
     });
   };
 
@@ -35,7 +31,7 @@ export const RegisterForm = ({ roleId, setRoleId, setUserIsCreated }) => {
         , ¿Quien&nbsp;eres?
       </p>
       <form className="flex flex-wrap" onSubmit={handleSubmit}>
-        {RegisterHelpers.inputList.map((elem) => (
+        {registerInputList.map((elem) => (
           <Input
             key={elem.name}
             name={elem.name}

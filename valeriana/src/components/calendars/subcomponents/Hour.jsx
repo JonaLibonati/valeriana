@@ -5,18 +5,18 @@ export const Hour = ({ hours, minutes }) => {
 
     const div = useRef(null);
 
-    const { selectedDate, hour, setHour, date, days } = useContext(DateContext);
+    const { selectedDateRef, hour, setHour, date, days } = useContext(DateContext);
 
     const handleClick = () => {
-        selectedDate.current.setHours(hours, minutes, 0);
-        setHour([selectedDate.current.getHours(), selectedDate.current.getMinutes()]);
+        selectedDateRef.current.setHours(hours, minutes, 0);
+        setHour([selectedDateRef.current.getHours(), selectedDateRef.current.getMinutes()]);
     }
 
     useEffect(() => {
-        const array1 = [selectedDate.current.getHours(), selectedDate.current.getMinutes()];
+        const array1 = [selectedDateRef.current.getHours(), selectedDateRef.current.getMinutes()];
         const array2 = [hours, minutes];
 
-        if (selectedDate.current.getHours() === hours && selectedDate.current.getMinutes() === minutes && hour.length != 0) {
+        if (selectedDateRef.current.getHours() === hours && selectedDateRef.current.getMinutes() === minutes && hour.length != 0) {
             div.current.classList.add('bg-primary-base')
         }
         else {div.current.classList.remove('bg-primary-base')}

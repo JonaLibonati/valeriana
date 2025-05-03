@@ -1,26 +1,28 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EditInput } from "./EditInput";
-import { UserContext } from "../../contexts/UserContext";
 import { MyDataSaveButton } from "./MyDataSaveButton";
 import { MydataRow } from "./MydataRow";
+import { useUser } from "../../contexts/UserContext";
+import { useData } from "../../contexts/DataContext";
 
 export const EmailModule = () => {
-  const { user, email, isLoadingEmail } = useContext(UserContext);
+
+  const { user } = useData();
+
+  const { email, setEmail, isLoadingEmail } = useUser();
 
   const [hasChanged, setHasChanged] = useState(false);
 
-  const { email_address } = user.data.current;
-
   useEffect(() => {
-    if (email !== email_address) {
+    if (email !== user.email_address) {
       setHasChanged(true);
     } else setHasChanged(false);
-  }, [email, email_address]);
+  }, [email, user.email_address]);
 
   return (
     <>
       <MydataRow labelText={"Email"}>
-        <EditInput type={"email"} value={email} setValue={user.setEmail} />
+        <EditInput type={"email"} value={email} setValue={setEmail} />
       </MydataRow>
 
       {hasChanged ? (

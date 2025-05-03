@@ -1,27 +1,28 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EditInput } from './EditInput';
-import { UserContext } from '../../contexts/UserContext';
 import { MydataRow } from './MydataRow';
 import { MyDataSaveButton } from './MyDataSaveButton';
+import { useData } from '../../contexts/DataContext';
+import { useUser } from '../../contexts/UserContext';
 
 export const LastNameModule = () => {
+  
+  const { user } = useData();
 
-  const { lastName, user, isLoadingLastName } = useContext(UserContext);
+  const { lastName, setLastName, isLoadingLastName } = useUser();
 
   const [hasChanged, setHasChanged] = useState(false);
 
-  const { last_name } = user.data.current;
-
   useEffect(() => {
-    if (lastName !== last_name) {
+    if (lastName !== user.last_name) {
       setHasChanged(true);
     } else setHasChanged(false);
-  }, [lastName, last_name])
+  }, [lastName, user.last_name])
 
   return (
     <>
       <MydataRow labelText={'Apellido'}>
-        <EditInput type={'text'} maxLength={30} value={lastName} setValue={user.setLastName} />
+        <EditInput type={'text'} maxLength={30} value={lastName} setValue={setLastName} />
       </MydataRow>
       {
         hasChanged ?

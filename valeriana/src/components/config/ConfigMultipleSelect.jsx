@@ -1,30 +1,9 @@
-import React, {useState} from 'react'
+import React, { useRef } from 'react'
+import { SelectMultipleFromList } from '../globalComponents/inputs/SelectMultipleFromList'
 
-export const ConfigMultipleSelect = ({setter, elements}) => {
-
-    const [selection, setSelection] = setter
-    const [selectionToggle, setSelectionToggle] = useState(false)
+export const ConfigMultipleSelect = ({selection, elements, handleSubmit, children}) => {
 
   return (
-    <div onClick={() => {selectionToggle? setSelectionToggle(false) : setSelectionToggle(true)}}
-      className={`relative flex flex-wrap cursor-pointer ${selectionToggle? "outline outline-1 outline-primary-base": ""}`}
-    >
-      {selectionToggle?
-      <>
-        <div className='flex flex-wrap'>
-          {elements.map((element) =>
-            <div className='m-1 p-1 bg-primary-light rounded-md' onClick={() => setSelection(element)}>{element[0]}</div>
-          )}
-        </div>
-      </> : <></>
-      }
-
-      {selection && !selectionToggle?
-      <>
-        <div>{selection[0]}
-        </div>
-      </> : <></>
-      }
-    </div>
+      <SelectMultipleFromList handleSubmit={handleSubmit} setter={[selection, () => {}]} elements={elements} className={[undefined, undefined, "m-1 p-1", 'm-1 p-1 bg-primary-light rounded-md', "outline outline-1 outline-primary-base"]}>{children}</SelectMultipleFromList>
   )
 }

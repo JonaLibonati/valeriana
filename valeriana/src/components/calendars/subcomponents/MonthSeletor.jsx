@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
-import { DateContext } from '../../../contexts/DateContext'
+import React from 'react'
+import { useDate } from '../../../contexts/DateContext'
 import { monthAbbr, monthNames } from '../../../helpers/time'
 
 export const MonthSeletor = () => {
 
-    const { selectedDate, setMonth, setMonthSelector } = useContext(DateContext)
+    const { selectedDateRef, setMonth, setMonthSelector } = useDate();
 
     const handleClick = (i) => {
         setMonth(monthNames[i]);
-        selectedDate.current.setMonth(i);
+        selectedDateRef.current.setMonth(i);
         setMonthSelector(false);
     }
 

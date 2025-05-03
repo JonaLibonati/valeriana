@@ -8,7 +8,7 @@ import { dayAbbr } from '../../helpers/time'
 
 export const CalendarWeek = () => {
 
-    const { daysInSelectedMonth, selectedDate } = useContext(DateContext);
+    const { daysInSelectedMonth, selectedDateRef } = useContext(DateContext);
         return (
             <div className='m-[30px] min-w-[1000px] '>
                 <div className='rounded-md bg-primary-base relative'>
@@ -25,7 +25,7 @@ export const CalendarWeek = () => {
                                 { daysInSelectedMonth.map( (text, i) =>
                                 <>
                                 <div className='h-[200px] border border-secondary-light p-1'>
-                                    <DateNumber text={text} font={'text-xs'} day={text} month={selectedDate.current.getMonth()} year={selectedDate.current.getFullYear()} i={i} key={i}/>
+                                    <DateNumber text={text} font={'text-xs'} day={text} month={selectedDateRef.current.getMonth()} year={selectedDateRef.current.getFullYear()} i={i} key={i}/>
                                 </div>
                                 </>) }
                             </div>

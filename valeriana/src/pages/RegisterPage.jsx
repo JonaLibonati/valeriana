@@ -2,21 +2,22 @@ import { useState } from "react"
 import { Roles } from "../components/register/Roles";
 import { SuccessRegisterMessage } from "../components/register/SuccessRegisterMessage";
 import { RegisterForm } from "../components/register/RegisterForm";
+import { useLogin } from "../contexts/LoginContext";
 
 export const RegisterPage = () => {
 
-  const [roleId, setRoleId] = useState(undefined);
+  const { isUserCreated } = useLogin();
 
-  const [userIsCreated, setUserIsCreated] = useState(false);
+  const [roleId, setRoleId] = useState(undefined);
 
   return (
       <>
       {roleId === undefined ? (
         <Roles setRoleId={setRoleId} />
-      ) : userIsCreated ? (
+      ) : isUserCreated ? (
         <SuccessRegisterMessage />
       ) : (
-        <RegisterForm roleId={roleId} setUserIsCreated={setUserIsCreated} setRoleId={setRoleId} />
+        <RegisterForm roleId={roleId} setRoleId={setRoleId} />
       )}
     </>
   )

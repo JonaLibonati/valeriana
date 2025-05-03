@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { DateContext } from '../../../contexts/DateContext';
+import React, { useEffect, useRef } from 'react'
+import { useDate } from '../../../contexts/DateContext';
 import { Temporal } from 'temporal-polyfill';
 
-export const DateNumber = ({ text, font, day, month, year, ij }) => {
-    const { selectedDate, currentDate, yearTrigger, dateTrigger, setDateTrigger } = useContext(DateContext);
+export const DateNumber = ({ text, font, day, month, year, timeZone, ij }) => {
+    const { selectedDateRef, selectedDate, setSelectedDate, currentDate, currentDateRef } = useDate();
 
     const div = useRef(null);
     const initialDay = useRef(day);
@@ -11,28 +11,27 @@ export const DateNumber = ({ text, font, day, month, year, ij }) => {
     const handleClick = () => {
       if (text != "") {
         div.current.classList.add('bg-primary-base')
-        setDateTrigger(selectedDate.current.day)
-        selectedDate.current = Temporal.ZonedDateTime.from({year: year, month: month, day: day, timeZone: Temporal.Now.zonedDateTimeISO().timeZoneId});
-        setDateTrigger(selectedDate.current.day)
+        selectedDateRef.current = Temporal.ZonedDateTime.from({year, month, day, timeZone});
+        setSelectedDate(selectedDateRef.current)
       }
     }
 
     useEffect(() => {
-      if (selectedDate.current.day != day || selectedDate.current.month != month || selectedDate.current.year != year ) {
+      if (selectedDateRef.current.day != day || selectedDateRef.current.month != month || selectedDateRef.current.year != year ) {
         div.current.classList.remove('bg-primary-base')}
 
-      if (currentDate.day === initialDay.current && currentDate.month === month && currentDate.year === year) {
+      if (currentDateRef.current.day === initialDay.current && currentDateRef.current.month === month && currentDateRef.current.year === year) {
         div.current.classList.remove('bg-primary-base');
         div.current.classList.add('bg-secondary-light');
       } else {
         div.current.classList.remove('bg-secondary-light');
       }
 
-    }, [dateTrigger])
+    }, [selectedDate, currentDate])
 
     useEffect(() => {
       div.current.classList.remove('bg-primary-base')
-    }, [yearTrigger])
+    }, [selectedDate.year, selectedDate.month])
 
   return (
     <div ref={div} className={`size-9 flex justify-items-center items-center rounded-3xl ${font == undefined? '': font}`}>

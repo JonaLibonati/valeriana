@@ -1,23 +1,21 @@
-import React, { useContext } from 'react'
-import { NewPasswordHelpers } from "../../helpers/newPasswordHelpers";
+import React from 'react'
 import { LoginOption } from './LoginOption'
-import { PopUpContext } from '../../contexts/PopUpContext';
+import { useLogin } from '../../contexts/LoginContext';
 
-export const NewPassOption = ({ emailElem, setIsLoading, setNewPassEmail, setNewPassIsSent }) => {
+export const NewPassOption = ({ emailElem }) => {
 
-  const { usePopUp } = useContext(PopUpContext);
+  const { handleSendNewPassEmail, setLogInEmail} = useLogin();
 
-  const handleNewPassword = (e) => {
-    const setters = { usePopUp, setIsLoading, setNewPassIsSent };
-    NewPasswordHelpers.handleSendPasswordEmail(e, { emailElem, setters });
-    setNewPassEmail(emailElem.current.value);
+  const handleClick = async (e) => {
+    setLogInEmail(emailElem.current.value);
+    await handleSendNewPassEmail( e, emailElem.current.value)
   };
 
   return (
     <LoginOption >
       <button
         className="text-primary-dark"
-        onClick={handleNewPassword}
+        onClick={handleClick}
       >
         Recuperar contraseña
       </button>

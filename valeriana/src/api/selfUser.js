@@ -1,9 +1,10 @@
+import { redirectController } from "./redirectController";
 
 export class SelfUser {
   static async getAll() {
     const res = await fetch("/v1/users/self");
     const body = await res.json();
-    redirect(res, body);
+    redirectController(res, body);
 
     return { res, body };
   }
@@ -31,7 +32,7 @@ export class SelfUser {
     };
     const res = await fetch("/v1/users/self/userName", options);
     const body = await res.json();
-    redirect(res, body);
+    redirectController(res, body);
 
     return { res, body };
   }
@@ -46,7 +47,7 @@ export class SelfUser {
     };
     const res = await fetch("/v1/users/self/firstName", options);
     const body = await res.json();
-    redirect(res, body);
+    redirectController(res, body);
 
     return { res, body };
   }
@@ -61,7 +62,7 @@ export class SelfUser {
     };
     const res = await fetch("/v1/users/self/lastName", options);
     const body = await res.json();
-    redirect(res, body);
+    redirectController(res, body);
 
     return { res, body };
   }
@@ -77,7 +78,7 @@ export class SelfUser {
     const res = await fetch("/v1/users/self/email", options);
     const body = await res.json();
 
-    redirect(res, body);
+    redirectController(res, body);
 
     return { res, body };
   }
@@ -98,7 +99,7 @@ export class SelfUser {
       window.location.href = '/app/user/home';
     }
 
-    redirect(res, body);
+    redirectController(res, body);
 
     return { res, body };
   }
@@ -115,10 +116,3 @@ export class SelfUser {
   }
 }
 
-const redirect = (res, body) => {
-  if (res.status === 498 && body.code === 'ER_TOKEN_DENIED') {
-    window.location.href = '/app/login';
-  } else if (res.status === 401 && body.code === 'ER_EMAIL_NO_VALIDATED') {
-    window.location.href = '/app/validate';
-  }
-}

@@ -7,7 +7,7 @@ import { dayAbbr, monthNames } from '../../helpers/time'
 
 export const CalendarYear = () => {
 
-    const { daysInSelectedYear, selectedDate } = useContext(DateContext);
+    const { daysInSelectedYear, selectedDateRef } = useContext(DateContext);
 
     return (
         <div className='min-w-[calc(300px+2rem)]'>
@@ -22,7 +22,7 @@ export const CalendarYear = () => {
                         <p className='pl-2.5 text-xl'>{monthNames[i]}</p>
                         <div className='grid grid-cols-7 gap-[2px] justify-items-center items-center h-[300px] '>
                             { dayAbbr.map( (text) => <Day text={text}/> ) }
-                            { days.map( (text, j) => <DateNumber text={text} font={'text-xs'} day={text} month={i} year={selectedDate.current.year} ij={`${i}${j}`} key={`${i}${j}`}/>) }
+                            { days.map( (text, j) => <DateNumber text={text} font={'text-xs'} day={text} month={i} year={selectedDateRef.current.year} ij={`${i}${j}`} key={`${i}${j}`}/>) }
                         </div>
                     </div>
                 </> ) }

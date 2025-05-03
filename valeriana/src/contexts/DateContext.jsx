@@ -1,27 +1,27 @@
 
-import { createContext, useRef, useState, useEffect } from "react";
+import { createContext, useRef, useState, useEffect, useContext } from "react";
 import { Temporal } from 'temporal-polyfill';
+import { useData } from "./DataContext";
 
 export const DateContext = createContext(null);
 
 export const DateProvider = ({children}) => {
 
-    const selectedDate = useRef (Temporal.Now.zonedDateTimeISO()); // creates a new date object with the current date and time
-    const currentDate = Temporal.Now.zonedDateTimeISO(); // creates a new date object with the current date and time
+    const { config } = useData();
+
+    const selectedDateRef = useRef (Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId())); // creates a new date object with the current date and time
+    const [selectedDate, setSelectedDate] = useState(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId()));
+    
+    const currentDateRef = useRef (Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId())); // creates a new date object with the current date and time
+    const [currentDate, setCurrentDate] = useState(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId()));
 
     const [daysInSelectedMonth, setDaysSelectedMonth] = useState([]);
 
     const [daysInSelectedYear, setDaysInSelectedYear] = useState([]);
 
-    const [dateTrigger, setDateTrigger] = useState();
-
-    const [hour, setHour] = useState([]);
-
-    const [monthTrigger, setMonthTrigger] = useState();
     const [monthSelector, setMonthSelector] = useState(false);
-
-    const [yearTrigger, setYearTrigger] = useState();
     const [yearSelector, setYearSelector] = useState(false);
+
 
     const getMonthDays = (monthNum, yearNum) => {
 
@@ -50,24 +50,20 @@ export const DateProvider = ({children}) => {
     }
 
     useEffect(() => {
-        setDaysSelectedMonth(getMonthDays(selectedDate.current.month, selectedDate.current.year));
-        setDaysInSelectedYear(getYearDays(selectedDate.current.year));
-    }, [dateTrigger]);
+        setDaysSelectedMonth(getMonthDays(selectedDateRef.current.month, selectedDateRef.current.year));
+        setDaysInSelectedYear(getYearDays(selectedDateRef.current.year));
+    }, [selectedDate]);
 
     return (
         <DateContext.Provider value={{
+            selectedDateRef,
             selectedDate,
+            setSelectedDate,
+            currentDateRef,
             currentDate,
+            setCurrentDate,
             daysInSelectedMonth,
             daysInSelectedYear,
-            hour,
-            setHour,
-            monthTrigger,
-            setMonthTrigger,
-            yearTrigger,
-            setYearTrigger,
-            dateTrigger,
-            setDateTrigger,
             monthSelector,
             setMonthSelector,
             yearSelector,
@@ -77,3 +73,5 @@ export const DateProvider = ({children}) => {
         </DateContext.Provider>
     );
 }
+
+export const useDate = () => useContext(DateContext);

@@ -1,14 +1,26 @@
-import { useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { CalendarYear } from "../components/calendars/CalendarYear"
 import { CalendarMonth } from "../components/calendars/CalendarMonth"
 import { RuleSelector } from "../components/appointments/RuleSelector";
 import { google } from "../api/google";
 import { OutlineButton } from "../components/globalComponents/buttons/OutlineButton";
 import { GoogleCalendarIcon } from "../components/globalComponents/icons/GoogleCalendarIcon"
+import { SelectFromList } from '../components/globalComponents/inputs/SelectFromList'
+import { Temporal } from "temporal-polyfill";
+import { useData } from "../contexts/DataContext";
+import { useDate } from "../contexts/DateContext";
 
 export const AppointmentsPage = () => {
 
+    const { config } = useData();
+
+    const { selectedDateRef, setSelectedDate, currentDateRef, setCurrentDate} = useDate();
+
     const [isGoogleSync, setisGoogleSync] = useState(false);
+
+    const [timeZone, setTimeZone] = useState(config.calendar_time_zone || Temporal.Now.zonedDateTimeISO().timeZoneId);
+
+    const timeZoneOptions = config.calendar_time_zones_list? [config.calendar_time_zone || timeZone, ...JSON.parse(config.calendar_time_zones_list)[0]] : [timeZone];
 
     useEffect(() => {
         google.isCalendarSync()
@@ -18,6 +30,14 @@ export const AppointmentsPage = () => {
             console.error(error);
         });
     }, [])
+
+    useEffect(() => {
+        const { day, month, year} = selectedDateRef.current;
+        selectedDateRef.current = Temporal.ZonedDateTime.from({year, month, day, timeZone});
+        setSelectedDate((date) => Temporal.ZonedDateTime.from({year: date.year, month: date.month, day: date.day, timeZone}))
+        currentDateRef.current = Temporal.ZonedDateTime.from({year: currentDateRef.current.year, month: currentDateRef.current.month, day: currentDateRef.current.day, timeZone});
+        setCurrentDate((date) => Temporal.ZonedDateTime.from({year: date.year, month: date.month, day: date.day, timeZone}))
+    }, [timeZone])
 
     const [selectedCalendar, setSelectedCalendar] = useState(2);
 
@@ -46,6 +66,13 @@ export const AppointmentsPage = () => {
                             </div>
                         </OutlineButton>
                     }
+                    <div className="mt-6">
+                        <SelectFromList
+                            placeholder={'Zona horaria'}
+                            setter={[timeZone, setTimeZone]}
+                            elements={timeZoneOptions}
+                            className={["p-1 pr-2 pl-2", "text-sm p-2 pt-1 pb-1 ml-2 mt-1 bg-secondary-light rounded-md", "text-sm mt-2 mb-1 bg-primary-light rounded-md", 'basis-full p-2', "outline outline-1 outline-primary-base"]}/>
+                    </div>
                 </div>
                 {
                     selectedCalendar == 0?
@@ -53,7 +80,7 @@ export const AppointmentsPage = () => {
                     selectedCalendar == 1?
                     <>work in progress</> :
                     selectedCalendar == 2?
-                    <CalendarMonth /> :
+                    <CalendarMonth timeZone={timeZone}/> :
                     selectedCalendar == 3?
                     <CalendarYear /> :
                     <></>

@@ -1,242 +1,189 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { SelfUser } from "../api/selfUser";
 import { validateFirstName, validateLastName, validateNewEmail, validateUserName } from "../schemes/userSchema";
-import { Temporal } from "temporal-polyfill";
+import { useData } from "./DataContext";
+import { usePopUpContext } from "./PopUpContext";
 
 export const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
 
-  const [userName, setUserName] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const { user, setUser } = useData();
+  
+  const { usePopUp } = usePopUpContext()
 
-  const userData = useRef({});
-  const roleId = useRef('');
-  const role = useRef('');
-
-  const [lang, setLang] = useState('es');
-  const [theme, setTheme] = useState('');
-  const [calendarLocale, setCalendarLocale] = useState(navigator.language);
-  const [calendarTimeZone, setCalendarTimeZone] = useState(Temporal.Now.zonedDateTimeISO().timeZoneId);
-
-  console.log(lang, calendarLocale, calendarTimeZone)
-
-  const config = {
-    lang,
-    theme,
-    calendarLocale,
-    calendarTimeZone
-  }
-
-  const user = {
-    data: userData,
-    config,
-    roleId,
-    role,
-    setUserName,
-    setFirstName,
-    setLastName,
-    setEmail
-  }
+  const [userName, setUserName] = useState(user.user_name);
+  const [firstName, setFirstName] = useState(user.first_name);
+  const [lastName, setLastName] = useState(user.last_name);
+  const [email, setEmail] = useState(user.email_address);
 
   useEffect(() => {
-    SelfUser.getAll()
-      .then(({ body }) => {
-        user.setUserName(body.user_name);
-        user.setFirstName(body.first_name);
-        user.setLastName(body.last_name);
-        user.setEmail(body.email_address);
-        user.data.current = body;
-        user.roleId.current = body.user_roleId;
-        user.role.current = body.role_name;
-      })
-      .catch(console.error)
-  }, [user.role.current])
+    setUserName(user.user_name);
+    setFirstName(user.first_name);
+    setLastName(user.last_name);
+    setEmail(user.email_address);
+
+  }, [user])
 
   const [isLoadingUserName, setIsLoadingUserName] = useState(false);
   const [isLoadingFirstName, setIsLoadingFirstName] = useState(false);
   const [isLoadingLastName, setIsLoadingLastName] = useState(false);
   const [isLoadingEmail, setIsLoadingEmail] = useState(false);
 
-  class UserHelpers {
+  const handleNewUserName = async (e) => {
 
-    static async handleNewUserName(e, { setters }) {
+    e.preventDefault();
 
-      e.preventDefault();
+    let input = {
+      user_name: e.target[0].value == "" ? undefined : e.target[0].value,
+    };
 
-      const { user_name } = user.data.current;
+    input = validateUserName(input);
 
-      const { usePopUp } = setters;
+    if (!input.success) {
+      console.log(input.error.issues);
+      const message = input.error.issues[0].message;
 
-      let input = {
-        user_name: e.target[0].value == "" ? undefined : e.target[0].value,
-      };
-
-      input = validateUserName(input);
-
-      if (!input.success) {
-        console.log(input.error.issues);
-        const message = input.error.issues[0].message;
-
-        message === "Required"
-          ? usePopUp("Todos los campos son requeridos", "error")
-          : usePopUp(message, "error");
-        return;
-      }
-
-      if (user_name !== input.data.user_name) {
-        setIsLoadingUserName(true);
-        try {
-          const { res, body } = await SelfUser.setUserName(input.data);
-          const { user_name } = body;
-
-          if (res.status === 200) {
-            usePopUp("Usuario actualizado correctamente", "success");
-            user.data.current = { ...user.data.current, user_name };
-          }
-        } catch (e) {
-          usePopUp("Ups! Algo no ha salido bien.", "error")
-          console.error(e);
-        }
-        setIsLoadingUserName(false);
-      }
+      message === "Required"
+        ? usePopUp("Todos los campos son requeridos", "error")
+        : usePopUp(message, "error");
+      return;
     }
 
-    static async handleNewFirstName(e, { setters }) {
+    if (user.user_name !== input.data.user_name) {
+      setIsLoadingUserName(true);
+      try {
+        const { res, body } = await SelfUser.setUserName(input.data);
+        const { user_name } = body;
 
-      e.preventDefault();
-
-      const { first_name } = user.data.current;
-
-      const { usePopUp } = setters;
-
-      let input = {
-        first_name: e.target[0].value == "" ? undefined : e.target[0].value,
-      };
-
-      input = validateFirstName(input);
-
-      if (!input.success) {
-        console.log(input.error.issues);
-        const message = input.error.issues[0].message;
-
-        message === "Required"
-          ? usePopUp("Todos los campos son requeridos", "error")
-          : usePopUp(message, "error");
-        return;
-      }
-
-      if (first_name !== input.data.first_name) {
-        setIsLoadingFirstName(true);
-
-        try {
-          const { res, body } = await SelfUser.setFirstName(input.data);
-          const { first_name } = body;
-
-          if (res.status === 200) {
-            usePopUp("Usuario actualizado correctamente", "success")
-            user.data.current = { ...user.data.current, first_name };
-          }
-        } catch (e) {
-          usePopUp("Ups! Algo no ha salido bien.", "error")
-          console.error(e);
+        if (res.status === 200) {
+          usePopUp("Usuario actualizado correctamente", "success");
+          setUser(user => {return { ...user, user_name }});
         }
-        setIsLoadingFirstName(false);
+      } catch (error) {
+        usePopUp("Ups! Algo no ha salido bien.", "error")
+        console.error(error);
       }
-    }
-
-    static async handleNewLastName(e, { setters }) {
-      e.preventDefault();
-
-      const { last_name } = user.data.current;
-      const { usePopUp } = setters;
-
-      let input = {
-        last_name: e.target[0].value == "" ? undefined : e.target[0].value,
-      };
-
-      input = validateLastName(input);
-
-      if (!input.success) {
-        console.log(input.error.issues);
-        const message = input.error.issues[0].message;
-
-        message === "Required"
-          ? usePopUp("Todos los campos son requeridos", "error")
-          : usePopUp(message, "error");
-        return;
-      }
-
-      if (last_name !== input.data.last_name) {
-        setIsLoadingLastName(true);
-
-        try {
-          const { res, body } = await SelfUser.setLastName(input.data);
-          const { last_name } = body;
-
-          if (res.status === 200) {
-            usePopUp("Usuario actualizado correctamente", "success");
-            user.data.current = { ...user.data.current, last_name };
-          }
-        } catch (e) {
-          usePopUp("Ups! Algo no ha salido bien.", "error")
-          console.error(e);
-        }
-        setIsLoadingLastName(false);
-      }
-    }
-
-    static async handleNewEmail(e, { setters }) {
-      e.preventDefault();
-
-      const { email_address } = user.data.current;
-      const { usePopUp } = setters;
-
-      let input = {
-        email_address: e.target[0].value == "" ? undefined : e.target[0].value,
-        confirm_email: e.target[1].value == "" ? undefined : e.target[1].value,
-        user_password: e.target[2].value == "" ? undefined : e.target[2].value,
-      };
-
-      input = validateNewEmail(input);
-
-
-      if (!input.success) {
-        console.log(input.error.issues);
-        const message = input.error.issues[0].message;
-
-        message === "Required"
-          ? usePopUp("Todos los campos son requeridos", "error")
-          : usePopUp(message, "error");
-        return;
-      }
-
-      if (email_address !== input.data.email_address) {
-        setIsLoadingEmail(true);
-        try {
-          const { res, body } = await SelfUser.setEmail(input.data);
-          const { email_address } = body;
-
-          if (res.status === 200) {
-            usePopUp("Usuario actualizado correctamente", "success");
-            user.data.current = { ...user.data.current, email_address };
-          } else if (res.status === 401) {
-            usePopUp("Contraseña incorrecta.", "error");
-          }
-        } catch (e) {
-          usePopUp("Ups! Algo no ha salido bien.", "error");
-          console.error(e);
-        }
-        setIsLoadingEmail(false);
-      }
+      setIsLoadingUserName(false);
     }
   }
 
-  class Config {
-    static async hola() {
-      console.log('hola')
+  const handleNewFirstName = async (e) => {
+
+    e.preventDefault();
+
+    let input = {
+      first_name: e.target[0].value == "" ? undefined : e.target[0].value,
+    };
+
+    input = validateFirstName(input);
+
+    if (!input.success) {
+      console.log(input.error.issues);
+      const message = input.error.issues[0].message;
+
+      message === "Required"
+        ? usePopUp("Todos los campos son requeridos", "error")
+        : usePopUp(message, "error");
+      return;
+    }
+
+    if (user.first_name !== input.data.first_name) {
+      setIsLoadingFirstName(true);
+
+      try {
+        const { res, body } = await SelfUser.setFirstName(input.data);
+        const { first_name } = body;
+
+        if (res.status === 200) {
+          usePopUp("Usuario actualizado correctamente", "success");
+          setUser(user => {return { ...user, first_name }});
+        }
+      } catch (e) {
+        usePopUp("Ups! Algo no ha salido bien.", "error")
+        console.error(e);
+      }
+      setIsLoadingFirstName(false);
+    }
+  }
+
+  const handleNewLastName = async (e) => {
+    e.preventDefault();
+
+    let input = {
+      last_name: e.target[0].value == "" ? undefined : e.target[0].value,
+    };
+
+    input = validateLastName(input);
+
+    if (!input.success) {
+      console.log(input.error.issues);
+      const message = input.error.issues[0].message;
+
+      message === "Required"
+        ? usePopUp("Todos los campos son requeridos", "error")
+        : usePopUp(message, "error");
+      return;
+    }
+
+    if (user.last_name !== input.data.last_name) {
+      setIsLoadingLastName(true);
+
+      try {
+        const { res, body } = await SelfUser.setLastName(input.data);
+        const { last_name } = body;
+
+        if (res.status === 200) {
+          usePopUp("Usuario actualizado correctamente", "success");
+          setUser(user => {return { ...user, last_name }});
+        }
+      } catch (e) {
+        usePopUp("Ups! Algo no ha salido bien.", "error")
+        console.error(e);
+      }
+      setIsLoadingLastName(false);
+    }
+  }
+
+  const handleNewEmail = async (e) => {
+    e.preventDefault();
+
+    let input = {
+      email_address: e.target[0].value == "" ? undefined : e.target[0].value,
+      confirm_email: e.target[1].value == "" ? undefined : e.target[1].value,
+      user_password: e.target[2].value == "" ? undefined : e.target[2].value,
+    };
+
+    input = validateNewEmail(input);
+
+
+    if (!input.success) {
+      console.log(input.error.issues);
+      const message = input.error.issues[0].message;
+
+      message === "Required"
+        ? usePopUp("Todos los campos son requeridos", "error")
+        : usePopUp(message, "error");
+      return;
+    }
+
+    if (user.email_address !== input.data.email_address) {
+      setIsLoadingEmail(true);
+      try {
+        const { res, body } = await SelfUser.setEmail(input.data);
+        const { email_address } = body;
+
+        if (res.status === 200) {
+          usePopUp("Usuario actualizado correctamente", "success");
+          setUser(user => {return { ...user, email_address }});
+        } else if (res.status === 401) {
+          usePopUp("Contraseña incorrecta.", "error");
+        }
+      } catch (e) {
+        usePopUp("Ups! Algo no ha salido bien.", "error");
+        console.error(e);
+      }
+      setIsLoadingEmail(false);
     }
   }
 
@@ -244,11 +191,17 @@ export const UserProvider = ({ children }) => {
     <UserContext.Provider
       value={{
         userName,
+        setUserName,
         firstName,
+        setFirstName,
         lastName,
+        setLastName,
         email,
-        user,
-        UserHelpers,
+        setEmail,
+        handleNewUserName,
+        handleNewFirstName,
+        handleNewLastName,
+        handleNewEmail,
         isLoadingUserName,
         isLoadingFirstName,
         isLoadingLastName,
@@ -259,3 +212,5 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+
+export const useUser = () => useContext(UserContext);

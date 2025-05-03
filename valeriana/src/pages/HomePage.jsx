@@ -2,14 +2,12 @@ import React, { useContext } from "react";
 import { TimeContext } from "../contexts/TimeContext";
 import { dayAbbr, monthAbbr } from "../helpers/time";
 import { Section } from "../components/globalComponents/layout/Section";
-import { UserContext } from "../contexts/UserContext";
 import { MyPsychologistCard } from "../components/home/MyPsychologistCard";
-import { PatientContext } from "../contexts/PatientContext";
+import { useData } from "../contexts/DataContext";
 
 export const HomePage = () => {
   const { date, day, month, hours, minutes } = useContext(TimeContext);
-  const { user } = useContext(UserContext);
-  const { myPatients } = useContext(PatientContext);
+  const { user } = useData();
 
   return (
     <div className="grid grid-cols-12 gap-3 min-w-[1150px]">
@@ -29,7 +27,7 @@ export const HomePage = () => {
           </p>
         </div>
       </Section>
-      {user.role.current == "patient" ? (
+      {user.role == "patient" ? (
         <MyPsychologistCard />
       ) : (
         <Section className="col-span-4">Estadistica 1</Section>

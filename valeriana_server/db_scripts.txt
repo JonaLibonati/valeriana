@@ -235,8 +235,8 @@ CREATE TABLE config (
 	user_id BINARY(16) NOT NULL,
     general_lang VARCHAR(2),
     general_theme VARCHAR(255),
-    calendar_locale VARCHAR(5),
-    calendar_time_zone VARCHAR(5),
+    calendar_locale VARCHAR(255),
+    calendar_time_zone VARCHAR(255),
     calendar_time_zones_list VARCHAR(8000),
     FOREIGN KEY(user_id) REFERENCES users(user_id),
     PRIMARY KEY(user_id)

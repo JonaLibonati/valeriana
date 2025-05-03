@@ -20,9 +20,7 @@ export class ConfigModel {
       [user_id]
     );
 
-    const list = await this.getConfig({ input });
-
-    return list;
+    return this.getConfig({ input });
   }
 
   static async delete({ input }) {
@@ -44,45 +42,57 @@ export class ConfigModel {
       [user_id]
     );
 
-    console.log(list);
+    return list[0];
+  }
 
-    return list;
+  static async setGeneralLang({ input }) {
+    const { general_lang, user_id } = input;
+
+    await connection.query(
+      'UPDATE config SET general_lang = ? WHERE user_id = UUID_TO_BIN(?);', [general_lang, user_id]
+    );
+
+    return this.getConfig({ input });
+  }
+
+  static async setGeneralTheme({ input }) {
+    const { general_theme, user_id } = input;
+
+    await connection.query(
+      'UPDATE config SET general_theme = ? WHERE user_id = UUID_TO_BIN(?);', [general_theme, user_id]
+    );
+
+    return this.getConfig({ input });
   }
 
   static async setCalendarLocale({ input }) {
     const { calendar_locale, user_id } = input;
 
     await connection.query(
-      'UPDATE users SET calendar_locale = ? WHERE user_id = UUID_TO_BIN(?);', [calendar_locale, user_id]
+      'UPDATE config SET calendar_locale = ? WHERE user_id = UUID_TO_BIN(?);', [calendar_locale, user_id]
     );
 
-    const list = await this.getConfig({ input });
-
-    return list;
+    return this.getConfig({ input });
   }
 
   static async setCalendarTimeZone({ input }) {
     const { calendar_time_zone, user_id } = input;
 
     await connection.query(
-      'UPDATE users SET calendar_time_zone = ? WHERE user_id = UUID_TO_BIN(?);', [calendar_time_zone, user_id]
+      'UPDATE config SET calendar_time_zone = ? WHERE user_id = UUID_TO_BIN(?);', [calendar_time_zone, user_id]
     );
 
-    const list = await this.getConfig({ input });
-
-    return list;
+    return this.getConfig({ input });
   }
 
   static async setCalendarTimeZonesList({ input }) {
     const { calendar_time_zones_list, user_id } = input;
 
     await connection.query(
-      'UPDATE users SET calendar_time_zones_list = ? WHERE user_id = UUID_TO_BIN(?);', [calendar_time_zones_list, user_id]
+      'UPDATE config SET calendar_time_zones_list = ? WHERE user_id = UUID_TO_BIN(?);', [calendar_time_zones_list, user_id]
     );
 
-    const list = await this.getConfig({ input });
-
-    return list;
+    return this.getConfig({ input });
   }
 
 }

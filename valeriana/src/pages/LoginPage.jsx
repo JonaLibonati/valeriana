@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { LoginForm } from "../components/login/LoginForm";
 import { EmailSentMessage } from "../components/login/EmailSentMessage";
+import { useLogin } from "../contexts/LoginContext";
 
 export const LoginPage = () => {
 
-  const [newPassEmail, setNewPassEmail] = useState(undefined);
-
-  const [newPassIsSent, setNewPassIsSent] = useState(false);
+  const { newPassIsSent, setNewPassIsSent } = useLogin()
 
   return (
     <>
     {!newPassIsSent ? (
         <>
-          <LoginForm setNewPassEmail={setNewPassEmail} setNewPassIsSent={setNewPassIsSent} />
+          <LoginForm />
         </>
       ) : (
-        <EmailSentMessage handleGoBack={() => setNewPassIsSent(false)} email={newPassEmail}/>
+        <EmailSentMessage handleGoBack={() => setNewPassIsSent(false)} />
       )}
     </>
   );

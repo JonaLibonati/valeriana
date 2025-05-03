@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ThemeSelector } from "../globalComponents/themeSelector/ThemeSelector";
 import { Outlet } from "react-router-dom";
 import image from "../../assets/images/valeriana.png";

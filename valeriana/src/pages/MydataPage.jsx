@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { UserContext } from "../contexts/UserContext";
+import React from "react";
+import { useUser } from "../contexts/UserContext";
 import { MydataModule } from "../components/mydata/MydataModule";
 import { UserNameModule } from "../components/mydata/UserNameModule";
 import { EmailModule } from "../components/mydata/EmailModule";
@@ -10,26 +10,26 @@ import { Section } from "../components/globalComponents/layout/Section";
 import { Column } from "../components/globalComponents/layout/Column";
 
 export const MydataPage = () => {
-  const { UserHelpers } = useContext(UserContext);
+  const { handleNewUserName, handleNewFirstName, handleNewLastName, handleNewEmail } = useUser();
 
   return (
     <Column>
       <Section>
         <Column>
-          <MydataModule handleSubmit={UserHelpers.handleNewUserName}>
+          <MydataModule handleSubmit={handleNewUserName}>
             <UserNameModule />
           </MydataModule>
-          <MydataModule handleSubmit={UserHelpers.handleNewFirstName}>
+          <MydataModule handleSubmit={handleNewFirstName}>
             <FirstNameModule />
           </MydataModule>
-          <MydataModule handleSubmit={UserHelpers.handleNewLastName}>
+          <MydataModule handleSubmit={handleNewLastName}>
             <LastNameModule />
           </MydataModule>
         </Column>
       </Section>
       <Section>
         <Column>
-          <MydataModule handleSubmit={UserHelpers.handleNewEmail}>
+          <MydataModule handleSubmit={handleNewEmail}>
             <EmailModule />
           </MydataModule>
         </Column>
