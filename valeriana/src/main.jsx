@@ -21,8 +21,8 @@ import { UserProvider } from "./contexts/UserContext";
 import { TimeProvider } from "./contexts/TimeContext";
 import { DateProvider } from "./contexts/DateContext";
 import { HomePage } from "./pages/HomePage";
-import { PsychologistPage } from "./pages/PsychologistPage";
-import { PatientsPage } from "./pages/PatientsPage";
+import { MyPsychologistPage } from "./pages/MyPsychologistPage";
+import { MyPatientsPage } from "./pages/MyPatientsPage";
 import { PsychologistProvider } from "./contexts/PsychologistContext";
 import { PatientProvider } from "./contexts/PatientContext";
 import { AppointmentsPage } from "./pages/AppointmentsPage";
@@ -30,8 +30,8 @@ import { GooglePage } from "./pages/GooglePage";
 import { DataProvider } from "./contexts/DataContext";
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { LoginProvider } from "./contexts/LoginContext";
-
-
+import { GoogleProvider } from "./contexts/GoogleContext";
+import { AppointmentsProvider } from "./contexts/AppointmentsContext";
 
 const router = createBrowserRouter([
   {
@@ -78,23 +78,30 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <PatientProvider><PsychologistProvider><HomePage/></PsychologistProvider></PatientProvider>,
+        element: <HomePage/>,
       },
       {
         path: "home",
-        element: <PatientProvider><PsychologistProvider><HomePage/></PsychologistProvider></PatientProvider>,
+        element: <HomePage/>,
       },
       {
         path: "appointments",
-        element: <DateProvider><PatientProvider><PsychologistProvider><AppointmentsPage/></PsychologistProvider></PatientProvider></DateProvider>,
+        element:
+          <GoogleProvider>
+            <DateProvider>
+              <AppointmentsProvider>
+                <AppointmentsPage/>
+              </AppointmentsProvider>
+            </DateProvider>
+          </GoogleProvider>,
       },
       {
         path: "patients",
-        element: <PatientProvider><PatientsPage /></PatientProvider>,
+        element: <PsychologistProvider><MyPatientsPage /></PsychologistProvider>,
       },
       {
         path: "psychologist",
-        element: <PsychologistProvider><PsychologistPage /></PsychologistProvider>,
+        element: <PatientProvider><MyPsychologistPage /></PatientProvider>,
       },
       {
         path: "mydata",
@@ -108,7 +115,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/google/oauthcallback",
-    element: <GooglePage />,
+    element: <GoogleProvider><GooglePage /></GoogleProvider>,
     errorElement: <ErrorPage />,
   },
 ]);

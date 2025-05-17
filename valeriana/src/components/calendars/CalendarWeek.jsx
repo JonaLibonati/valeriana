@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { Day } from './subcomponents/Day';
 import { DateContext } from '../../contexts/DateContext';
-import { YearSeletor } from './subcomponents/YearSeletor';
 import { DateNumber } from './subcomponents/DateNumber';
-import { MonthSeletorCarruselType } from './subcomponents/MonthSeletorCarruselType';
 import { dayAbbr } from '../../helpers/time'
+import { CalendarMonthSeletor } from './subcomponents/CalendarMonthSeletor';
+import { CalendarYearSeletor } from './subcomponents/CalendarYearSeletor';
 
 export const CalendarWeek = () => {
 
@@ -12,12 +12,8 @@ export const CalendarWeek = () => {
         return (
             <div className='m-[30px] min-w-[1000px] '>
                 <div className='rounded-md bg-primary-base relative'>
-                    <div className='p-4 ml-2.5 text-2xl text-white'>
-                        <YearSeletor className={'bg-primary-base'} />
-                    </div>
-                    <div className='p-4 text-2xl text-white bg-primary-dark'>
-                        <MonthSeletorCarruselType className={'bg-primary-dark'} />
-                    </div>
+                    <CalendarYearSeletor />
+                    <CalendarMonthSeletor />
                     <div className='justify-items-center gap-8 rounded-b-md bg-tertiary-light p-4'>
                         <div className='relative w-full'>
                             <div className='grid grid-cols-7 gap-1'>

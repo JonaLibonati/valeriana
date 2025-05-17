@@ -2,7 +2,7 @@ import React from 'react'
 import { useDate } from '../../../contexts/DateContext'
 import { monthAbbr, monthNames } from '../../../helpers/time'
 
-export const MonthSeletor = () => {
+export const MonthSelector = () => {
 
     const { selectedDateRef, setMonth, setMonthSelector } = useDate();
 

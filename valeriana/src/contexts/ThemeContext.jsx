@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { Cookies } from "../helpers/cookies";
 
 export const ThemeContext = createContext(null);
@@ -48,12 +48,24 @@ const useSetTheme = (theme) => {
       tertiaryLight: "rgb(255, 255, 255)",
     },
 
+    greenEmerald: {
+      primaryDark: "#246660",
+      primaryBase: "#238a80",
+      primaryLight: "#D0E4D2",
+      secondaryBase: "rgb(156 163 175)",
+      secondaryLight: "#e5e7eb",
+      tertiaryDark: "rgb(0, 0, 0)",
+      tertiaryLight: "rgb(255, 255, 255)",
+    },
+
     selector: {
       lightRose: "#fda4af",
+      greenEmerald: "#238a80",
       lightSky: "#7dd3fc",
       dark: "#292524",
       border: {
         lightRose: "#fb7185",
+        greenEmerald: "#246660",
         lightSky: "#38bdf8",
         dark: "#57534e",
       }
@@ -74,3 +86,5 @@ const useSetTheme = (theme) => {
     </ThemeContext.Provider>
   );
 };
+
+export const useTheme = () => useContext(ThemeContext);

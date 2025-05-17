@@ -3,11 +3,10 @@ import { TimeContext } from "../contexts/TimeContext";
 import { dayAbbr, monthAbbr } from "../helpers/time";
 import { Section } from "../components/globalComponents/layout/Section";
 import { MyPsychologistCard } from "../components/home/MyPsychologistCard";
-import { useData } from "../contexts/DataContext";
+import { PatientProvider } from "../contexts/PatientContext";
 
 export const HomePage = () => {
   const { date, day, month, hours, minutes } = useContext(TimeContext);
-  const { user } = useData();
 
   return (
     <div className="grid grid-cols-12 gap-3 min-w-[1150px]">
@@ -27,11 +26,7 @@ export const HomePage = () => {
           </p>
         </div>
       </Section>
-      {user.role == "patient" ? (
-        <MyPsychologistCard />
-      ) : (
-        <Section className="col-span-4">Estadistica 1</Section>
-      )}
+      <PatientProvider><MyPsychologistCard /></PatientProvider>
       <Section className="col-span-4">Estadistica 1</Section>
       <Section className="col-span-4">Notificaciones</Section>
       <Section className="col-span-4">Proximas consultas</Section>

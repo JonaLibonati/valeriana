@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { SelfUser } from "../api/selfUser";
+import { User } from "../api/user";
 import { validateFirstName, validateLastName, validateNewEmail, validateUserName } from "../schemes/userSchema";
 import { useData } from "./DataContext";
 import { usePopUpContext } from "./PopUpContext";
@@ -25,10 +25,16 @@ export const UserProvider = ({ children }) => {
 
   }, [user])
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [isLoadingUserName, setIsLoadingUserName] = useState(false);
   const [isLoadingFirstName, setIsLoadingFirstName] = useState(false);
   const [isLoadingLastName, setIsLoadingLastName] = useState(false);
   const [isLoadingEmail, setIsLoadingEmail] = useState(false);
+  const [isLoadingNewPassEmail, setIsLoadingNewPassEmail] = useState(false);
+
+  const [wasVerificationEmailSent, setWasVerificationEmailSent] = useState(false);
+  const [wasEmailVerified, setWasEmailVerified] = useState(false);
 
   const handleNewUserName = async (e) => {
 
@@ -53,7 +59,7 @@ export const UserProvider = ({ children }) => {
     if (user.user_name !== input.data.user_name) {
       setIsLoadingUserName(true);
       try {
-        const { res, body } = await SelfUser.setUserName(input.data);
+        const { res, body } = await User.setUserName(input.data);
         const { user_name } = body;
 
         if (res.status === 200) {
@@ -63,8 +69,7 @@ export const UserProvider = ({ children }) => {
       } catch (error) {
         usePopUp("Ups! Algo no ha salido bien.", "error")
         console.error(error);
-      }
-      setIsLoadingUserName(false);
+      } finally { setIsLoadingUserName(false); }
     }
   }
 
@@ -92,7 +97,7 @@ export const UserProvider = ({ children }) => {
       setIsLoadingFirstName(true);
 
       try {
-        const { res, body } = await SelfUser.setFirstName(input.data);
+        const { res, body } = await User.setFirstName(input.data);
         const { first_name } = body;
 
         if (res.status === 200) {
@@ -102,8 +107,7 @@ export const UserProvider = ({ children }) => {
       } catch (e) {
         usePopUp("Ups! Algo no ha salido bien.", "error")
         console.error(e);
-      }
-      setIsLoadingFirstName(false);
+      } finally {setIsLoadingFirstName(false);}
     }
   }
 
@@ -130,18 +134,17 @@ export const UserProvider = ({ children }) => {
       setIsLoadingLastName(true);
 
       try {
-        const { res, body } = await SelfUser.setLastName(input.data);
+        const { res, body } = await User.setLastName(input.data);
         const { last_name } = body;
 
         if (res.status === 200) {
           usePopUp("Usuario actualizado correctamente", "success");
           setUser(user => {return { ...user, last_name }});
         }
-      } catch (e) {
-        usePopUp("Ups! Algo no ha salido bien.", "error")
-        console.error(e);
-      }
-      setIsLoadingLastName(false);
+      } catch (error) {
+        usePopUp("Ups! Algo no ha salido bien.", "error");
+        console.error(error);
+      } finally { setIsLoadingLastName(false); }
     }
   }
 
@@ -170,7 +173,7 @@ export const UserProvider = ({ children }) => {
     if (user.email_address !== input.data.email_address) {
       setIsLoadingEmail(true);
       try {
-        const { res, body } = await SelfUser.setEmail(input.data);
+        const { res, body } = await User.setEmail(input.data);
         const { email_address } = body;
 
         if (res.status === 200) {
@@ -182,9 +185,62 @@ export const UserProvider = ({ children }) => {
       } catch (e) {
         usePopUp("Ups! Algo no ha salido bien.", "error");
         console.error(e);
-      }
-      setIsLoadingEmail(false);
+      } finally { setIsLoadingEmail(false); }
     }
+  }
+
+  const handleSendNewPassEmail = async (e) => {
+    setIsLoadingNewPassEmail(true);
+    try {
+      const { res, body } = await User.sendNewPassEmail(user);
+
+      if (res.status === 200) {
+        usePopUp(` Te enviamos un email para recuperar tu contraseña a: ${user.email_address}`, "success");
+      } else {
+        if (res.status === 401 && body.code === "ER_WRONG_LOG") {
+          usePopUp("La cuenta no existe.", "error");
+        } else {
+          usePopUp("Ups! Algo a salido mal.", "error");
+        }
+      }
+    } catch (error) {
+      usePopUp("Ups! Algo no ha salido bien.", "error");
+      console.error(error);
+    } finally {setIsLoadingNewPassEmail(false)};
+  }
+
+  const handleSendVerificationEmail = async () => {
+    setIsLoading(true)
+    setWasVerificationEmailSent(false);
+    try {
+      const { res, body } = await User.getVerificationEmail();
+
+      if (res.status === 200) {
+        setWasVerificationEmailSent(true);
+      } else {
+        usePopUp("Ups! Algo a salido mal.", "error");
+      }
+    } catch (error) {
+      usePopUp("Ups! Algo no ha salido bien.", "error");
+      console.error(error);
+    } finally {setIsLoading(false)};
+  }
+
+  const handleEmailVerification = async (user) => {
+    setIsLoading(true)
+    setWasEmailVerified(false);
+    try {
+      const { res, body } = await User.validateEmail(user);
+
+      if (res.status === 200) {
+        setWasEmailVerified(true);
+      } else {
+        usePopUp("Ups! Algo a salido mal.", "error");
+      }
+    } catch (error) {
+      usePopUp("Ups! Algo no ha salido bien.", "error");
+      console.error(error);
+    } finally {setIsLoading(false)};
   }
 
   return (
@@ -202,10 +258,17 @@ export const UserProvider = ({ children }) => {
         handleNewFirstName,
         handleNewLastName,
         handleNewEmail,
+        handleSendNewPassEmail,
+        handleSendVerificationEmail,
+        handleEmailVerification,
+        isLoading,
         isLoadingUserName,
         isLoadingFirstName,
         isLoadingLastName,
         isLoadingEmail,
+        isLoadingNewPassEmail,
+        wasVerificationEmailSent,
+        wasEmailVerified,
       }}
     >
       {children}

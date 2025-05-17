@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { usePopUpContext } from "./PopUpContext";
-import { login } from '../api/login';
+import { User } from '../api/user';
 import { validateAllUser, validateNewPassword } from '../schemes/userSchema';
 
 const LoginContext = createContext();
@@ -33,7 +33,7 @@ export const LoginProvider = ({ children }) => {
     setIsLoading(true);
 
     try {
-      const { res, body } = await login.userLogin(userData);
+      const { res, body } = await User.login(userData);
 
       console.log(body);
 
@@ -61,7 +61,7 @@ export const LoginProvider = ({ children }) => {
       setIsLoading(true);
 
       try {
-        const { res, body } = await login.sendNewPassEmail(userData);
+        const { res, body } = await User.sendNewPassEmail(userData);
 
         if (res.status === 200) {
           setNewPassIsSent(true);
@@ -111,7 +111,7 @@ export const LoginProvider = ({ children }) => {
     setIsLoading(true);
 
     try {
-      const { res, body } = await login.setNewPass(userData);
+      const { res, body } = await User.setNewPass(userData);
 
       if (res.status === 200) {
         setIsPassUpdated(true);
@@ -157,7 +157,7 @@ export const LoginProvider = ({ children }) => {
     setIsLoading(true);
 
     try {
-      const { res, body } = await userCreate(user.data);
+      const { res, body } = await User.create(user.data);
       if (res.status === 201) {
         console.log(body);
         setIsUserCreated(true);

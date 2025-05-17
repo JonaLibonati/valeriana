@@ -10,6 +10,21 @@ export class Config {
     return { res, body };
   }
 
+  static async setTheme({ general_theme }) {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ general_theme }),
+    };
+    const res = await fetch("/v1/config/general/theme", options);
+    const body = await res.json();
+
+    redirectController(res, body);
+    return { res, body };
+  }
+
   static async setCalendarLocale({ calendar_locale }) {
     const options = {
       method: "PATCH",

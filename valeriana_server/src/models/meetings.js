@@ -15,11 +15,13 @@ export class MeetingsModel {
   static async create({ input }) {
     const { meeting_start_time, meeting_duration, psychologist_patient_id } = input;
 
-    await connection.query(
+    const res = await connection.query(
       `INSERT INTO meetings (meeting_start_time, meeting_duration, psychologist_patient_id)
         VALUES(?, ?, UUID_TO_BIN(?));`,
       [meeting_start_time, meeting_duration, psychologist_patient_id]
     );
+
+    console.log(res)
 
     const list = await this.getMeetingsList({ input });
 
@@ -48,9 +50,6 @@ export class MeetingsModel {
         WHERE psychologist_patient_id = UUID_TO_BIN(?);`,
       [psychologist_patient_id]
     );
-
-    console.log(list);
-
     return list;
   }
 
@@ -58,16 +57,30 @@ export class MeetingsModel {
     const { user_id } = input;
 
     const [list] = await connection.query(
-      `SELECT BIN_TO_UUID(meeting_id) meeting_id, BIN_TO_UUID(meetings.psychologist_patient_id) psychologist_patient_id, BIN_TO_UUID(psychologist_id) psychologist_id, BIN_TO_UUID(patient_id) patient_id, meeting_start_time, meeting_end_time, meeting_duration
+      `
+        SELECT
+          BIN_TO_UUID(meeting_id) meeting_id,
+          BIN_TO_UUID(meetings.psychologist_patient_id) psychologist_patient_id,
+          BIN_TO_UUID(psychologist_id) psychologist_id,
+          psychologists.user_name as psychologist_user_name,
+          psychologists.first_name as psychologist_first_name,
+          psychologists.last_name as psychologist_last_name,
+          BIN_TO_UUID(patient_id) patient_id,
+          patients.user_name as patient_user_name,
+          patients.first_name as patient_first_name,
+          patients.last_name as patient_last_name,
+          meeting_start_time,
+          meeting_end_time,
+          meeting_duration
         FROM meetings
         INNER JOIN psychologists_patients ON psychologists_patients.psychologist_patient_id = meetings.psychologist_patient_id
+        INNER JOIN psychologists ON psychologists_patients.psychologist_id = psychologists.user_id
+        INNER JOIN patients ON psychologists_patients.patient_id = patients.user_id
         WHERE psychologist_id = UUID_TO_BIN(?) OR patient_id = UUID_TO_BIN(?)
-        ORDER BY psychologist_patient_id, meeting_start_time;`,
+        ORDER BY psychologist_patient_id, meeting_start_time;
+      `,
       [user_id, user_id]
     );
-
-    console.log(list);
-
     return list;
   }
 

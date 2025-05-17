@@ -41,7 +41,7 @@
   --color-primary-base: #fda4af;
   --color-primary-light: #fff1f2;
   --color-secondary-base: rgb(156 163 175);
-  --color-secondary-light: #e5e7eb;
+  --color-secondary-light: rgb(190 190 190);
   --color-tertiary-dark: #1c1917;
   --color-tertiary-light: #fafafa;
   --color-app-white: rgb(255, 255, 255);
@@ -53,7 +53,19 @@
   --color-primary-base: #7dd3fc;
   --color-primary-light: #f0f9ff;
   --color-secondary-base: rgb(156 163 175);
-  --color-secondary-light: #e5e7eb;
+  --color-secondary-light: rgb(190 190 190);
+  --color-tertiary-dark: #1c1917;
+  --color-tertiary-light: #fafafa;
+  --color-app-white: rgb(255, 255, 255);
+  --color-app-black: rgb(0, 0, 0);
+}
+
+#theme[data-theme="greenEmerald"] {
+  --color-primary-dark: #246660;
+  --color-primary-base: #238a80;
+  --color-primary-light: #D0E4D2;
+  --color-secondary-base: rgb(156 163 175);
+  --color-secondary-light: rgb(190 190 190);
   --color-tertiary-dark: #1c1917;
   --color-tertiary-light: #fafafa;
   --color-app-white: rgb(255, 255, 255);

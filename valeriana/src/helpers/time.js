@@ -21,14 +21,12 @@ export const updateTime = ({ setDate, setDay, setMonth, setHours, setMinutes }) 
 }
 
 export const toUtcMySqlDate = (DateObject) => {
-  return DateObject.toInstant().toString().slice(0, 19).replace('T', ' ')
+  return DateObject.toInstant().toString().slice(0, 19)
 }
 
-export const toUtcMySqlTime = (minutes) => {
-  const hours = Math.floor(Math.abs(minutes)/60)
-  const minuteMod = minutes - hours * 60
-
-  return `${hours}:${minuteMod}:00`
+export const toUtcMySqlTime = (durationTime) => {
+  const [hours, minutes] = durationTime || [0,0];
+  return `${hours}:${minutes}:00`
 }
 
 export const toDate = (mysqlDateTime, timeZone) => {

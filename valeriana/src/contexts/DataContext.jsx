@@ -1,30 +1,48 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { ContactPatient, ContactPsychologist } from '../api/contact';
 import { usePopUpContext } from "./PopUpContext";
-import { SelfUser } from "../api/selfUser";
+import { User } from "../api/user";
 import { Config } from "../api/config";
+import { Meeting } from '../api/meeting';
+import { Google } from '../api/google';
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-
   const { usePopUp } = usePopUpContext();
 
   const [user, setUser] = useState({});
   const [config, setConfig] = useState({});
+  const [contacts, setContacts] = useState([]);
+  const [meetings, setMeetings] = useState([]);
   const [firstLoading, setFirstLoading] = useState(true);
   const [configLoading, setConfigLoading] = useState(true);
 
   const firstFetchData = async () => {
     setFirstLoading(true);
     try {
-      const [user, config] = await Promise.all([SelfUser.getAll(), Config.getConfig()])
+      const [user, config, meetings] = await Promise.all([User.getAll(), Config.getConfig(), Meeting.getMeetingList(), Google.getCalendar()]);
 
       setUser(user.body);
       setConfig(config.body);
+      setMeetings(meetings.body);
 
-      console.log('hola desde first Fetch')
-      console.log(user.body)
-      console.log(config.body)
+      console.log('hola desde first Fetch');
+      console.log(user.body);
+      console.log(config.body);
+      console.log(meetings.body);
+
+      let contacts = [];
+
+      if (user.body.role_name == 'patient') {
+        contacts = await ContactPsychologist.getContactList();
+        setContacts(contacts.body);
+      } else if (user.body.role_name == 'psychologist') {
+        contacts = await ContactPatient.getContactList()
+      }
+
+      setContacts(contacts.body);
+      console.log(contacts.body);
 
     } catch (err) {
       usePopUp(err, "error")
@@ -40,7 +58,7 @@ export const DataProvider = ({ children }) => {
 
       setConfig(config.body);
     } catch (err) {
-      usePopUp(err, "error")
+      usePopUp(err, "error");
     } finally {
       setConfigLoading(false);
     }
@@ -57,6 +75,10 @@ export const DataProvider = ({ children }) => {
         setUser,
         config,
         setConfig,
+        contacts,
+        setContacts,
+        meetings,
+        setMeetings,
         firstLoading,
         configLoading,
         refetchAll: firstFetchData,

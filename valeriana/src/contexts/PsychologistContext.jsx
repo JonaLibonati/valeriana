@@ -1,54 +1,83 @@
-import { createContext, useState, useEffect } from "react";
-import { ContactPsychologist } from "../api/contact";
+import { createContext, useState, useEffect, useContext } from "react";
+import { ContactPatient } from "../api/contact";
 import { useData } from "./DataContext";
-
 
 export const PsychologistContext = createContext(null);
 
 export const PsychologistProvider = ({ children }) => {
 
-  const { user } = useData();
+  const { user, contacts } = useData();
 
-  const [myPsychologist, setMyPsychologist] = useState([]);
+    const [myPatients, setMyPatients] = useState([]);
+    const [myRequests, setMyRequests] = useState([]);
 
-  class PsychologistHelpers {
-    static async handleContact (e, psychologistData) {
-      console.log(psychologistData);
-      ContactPsychologist.create(psychologistData)
-        .then(({ res, body }) => {
-          if (res.status === 201) setMyPsychologist(body);
-          else console.error(res);
-        })
-        .catch((e) => console.error(e));
-    };
-
-    static async handleDelete (e) {
-      ContactPsychologist.delete()
-        .then(({ res, body }) => {
-          if (res.status === 201) setMyPsychologist(body);
-          else console.error(res);
-        })
-        .catch((e) => console.error(e));
-    };
-  }
-
-  useEffect(() => {
-    if ( user.role_name == 'patient') {
-      ContactPsychologist.getContactList().then(({ res, body }) => {
-        console.log(body)
-        if (res.status === 200) setMyPsychologist(body);
-        else console.error(res);
-      });
+    const filterContactList = (contacts) => {
+      if (contacts.length !== 0) {
+        let patients = [];
+        let requests = [];
+        contacts.map((contact) => {
+          if (contact.isAccepted) {
+            patients.push(contact);
+          } else {
+            requests.push(contact);
+          }
+        });
+        console.log(patients)
+        setMyPatients(patients);
+        setMyRequests(requests);
+      }
     }
-  }, []);
+
+    const handleDeletePatient = async (e, patientData) => {
+      ContactPatient.delete(patientData)
+        .then(({ res, body }) => {
+          if (res.status === 201) {
+            filterContactList(body);
+          }
+          else console.error(res);
+        })
+        .catch((e) => console.error(e));
+    }
+
+    const handleAcceptPatient = async (e, patientData) => {
+      ContactPatient.accept(patientData)
+        .then(({ res, body }) => {
+          if (res.status === 201) {
+            filterContactList(body);
+          }
+          else console.error(res);
+        })
+        .catch((e) => console.error(e));
+    }
+
+    /* const findPatientByID = (patient_id) => {
+      let result = ""
+      myPatients.map( (patient) => {
+        if (patient.user_id == patient_id) {
+          result = patient
+        }
+      } )
+      return result
+    } */
+
+    useEffect(() => {
+      filterContactList(contacts);
+    }, []);
 
   return (
     <PsychologistContext.Provider value={{
-      myPsychologist,
-      setMyPsychologist,
-      PsychologistHelpers
+      myPatients,
+      myRequests,
+      handleDeletePatient,
+      handleAcceptPatient,
     }}>
-      {children}
+      {user.role_name === "psychologist" ?
+        <>{children}</> :
+        <></>
+      }
     </PsychologistContext.Provider>
   );
 };
+
+export const usePsychologist = () => useContext(PsychologistContext);
+

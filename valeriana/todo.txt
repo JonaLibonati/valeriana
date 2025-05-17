@@ -1,0 +1,15 @@
+-- Email Verification
+  - Add button functionality in ValidationEmail.jsx
+  - Review functionality in ValidationUser.jsx
+
+-- DataContext.jsx
+  - Review whether Error handling should be improved or not.
+
+-- myPatientPage.
+  - Review whether Search patient should be add and psyco should have the posibility to add a patient.
+
+-- PsychologistContext
+  - Add function to create a meeting.
+
+-- DataContext
+  - Get meeting data from server

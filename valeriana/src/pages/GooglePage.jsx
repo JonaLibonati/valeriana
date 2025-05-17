@@ -1,81 +1,24 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect} from 'react'
 import { Link } from "react-router-dom";
 import { Loading } from '../components/globalComponents/loading/Loading';
 import { FilledButton } from '../components/globalComponents/buttons/FilledButton';
-import { google } from '../api/google';
+import { useGoogle } from '../contexts/GoogleContext';
 
 export const GooglePage = () => {
 
-    const firstRender = useRef(true)
-
-    const [syncResult, setSyncResult] = useState('');
-    const [isSyncSuccessful, setIsSyncSuccessful] = useState(false);
-    const [isCalendarSuccessful, setIsCalendarSuccessful] = useState(false);
-    const [createCalendarRes, setCreateCalendarRes] = useState('');
-    const [isSyncLoading, setIsSyncLoading] = useState(false);
-    const [isCalendarLoading, setIsCalendarLoading] = useState(false);
+    const { handleSyncCallback, handleCreateCalendar, syncResult, isSyncLoading, isSyncSuccessful, createCalendarRes, isCalendarSuccessful, isCalendarLoading } = useGoogle()
 
     useEffect( () => {
-        if (firstRender.current) {
-            const paramsString = window.location.href.split('?')[1];
-            const searchParams = new URLSearchParams(paramsString);
+        const paramsString = window.location.href.split('?')[1];
+        const searchParams = new URLSearchParams(paramsString);
 
-            const handleSync = async (code, scope) => {
-                setIsSyncLoading(true)
-
-                const {res, body} = await google.syncCallback({code, scope})
-
-                setSyncResult(body.code)
-
-                if (res.status == 200 && (body.code == 'TOKENS_SAVED' || body.code == 'TOKENS_UPDATED' || body.code == 'GRANT_ALREADY_OBTAINED')) {
-                    console.info(body.code)
-                    setIsSyncSuccessful(true)
-                } else {
-                    console.error(body.code)
-                    console.info(body.data)
-                    setIsSyncSuccessful(false)
-                }
-
-                setIsSyncLoading(false)
-            }
-
-            const handleCreateCalendar = async () => {
-                setIsCalendarLoading(true)
-
-                const {res, body} = await google.createCalendar()
-
-                setCreateCalendarRes(body.code)
-
-                if (res.status == 200) {
-                    console.info(body.code)
-                    setIsCalendarSuccessful(true)
-                } else {
-                    console.error(body.code)
-                    setIsCalendarSuccessful(false)
-                }
-
-                setIsCalendarLoading(false)
-            }
-
-            if (searchParams.get('code') && searchParams.get('scope')) {
-                (async ( ) => {
-                    await handleSync(searchParams.get('code'), searchParams.get('scope'))
-                    await handleCreateCalendar()
-                })()
-            }
+        if (searchParams.get('code') && searchParams.get('scope')) {
+            (async ( ) => {
+                await handleSyncCallback(searchParams.get('code'), searchParams.get('scope'))
+                await handleCreateCalendar()
+            })()
         }
-        firstRender.current = false
-
     }, [])
-
-    useEffect(() => {
-        google.setIsCalendarSync(1)
-            .then(({body}) => {
-                console.log(body)
-            }).catch((error) => {
-                console.error(error);
-            });
-    }, [isSyncSuccessful, isCalendarSuccessful])
 
   return (
     <div className='bg-primary-light text-tertiary-dark h-screen'>
@@ -109,9 +52,8 @@ export const GooglePage = () => {
                 <FilledButton className='mt-6'>
                     <Link className='text-center' to='/app/user/appointments' >Volver</Link>
                 </FilledButton>
-            </div>  
+            </div>
         </div>
-        
     </div>
   )
 }

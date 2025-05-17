@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { SelfUser } from '../../api/selfUser';
+import { User } from '../../api/user';
 import { Link, Outlet } from 'react-router-dom';
 import { TimeContext } from '../../contexts/TimeContext';
 import { dayLongAbbr, monthAbbr } from '../../helpers/time';
@@ -13,11 +13,11 @@ export const UserDashboard = () => {
   const { user, firstLoading } = useData()
 
   const handleLogout = async () => {
-    await SelfUser.logout()
+    await User.logout()
   }
 
   return (
-    <div className='grid grid-cols-[280px_minmax(0,1fr)] grid-rows-[60px_minmax(0,1fr)] min-h-dvh'>
+    <div className='grid grid-cols-[220px_minmax(0,1fr)] grid-rows-[60px_minmax(0,1fr)] min-h-dvh'>
       <nav className='row-span-2 bg-tertiary-light'>
         <div className='relative grid grid-rows-[fit-content(0)_1fr_fit-content(0)] gap-2 h-full p-4 text-tertiary-dark'>
           <h1 className='sacramento text-[40px] text-tertiary-dark'>Valeriana</h1>

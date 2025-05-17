@@ -4,33 +4,33 @@ import { monthNames } from '../../../helpers/time'
 
 export const MonthSeletorCarruselType = ({className}) => {
 
-    const { selectedDateRef, selectedDate, setSelectedDate, setMonthSelector } = useDate()
+    const { selectedDateRef, selectedDate, setMonthSelector, useUpdateSelectedDate } = useDate()
 
         const handleClickAdd = () => {
+            let date;
             if(selectedDateRef.current.month < 12) {
-                selectedDateRef.current = selectedDateRef.current.add({months: 1});
-                
+                date = selectedDateRef.current.add({months: 1});
             } else {
-                selectedDateRef.current = selectedDateRef.current.subtract({months: 11});
+                date = selectedDateRef.current.subtract({months: 11});
             }
-            setSelectedDate(selectedDateRef.current)
+            useUpdateSelectedDate(date)
         }
 
         const handleClickSubtract = () => {
-            console.log(selectedDateRef.current.month)
+            let date;
             if (selectedDateRef.current.month > -1) {
-                selectedDateRef.current = selectedDateRef.current.subtract({months: 1});
+                date = selectedDateRef.current.subtract({months: 1});
             } else {
-                selectedDateRef.current = selectedDateRef.current.subtract({months: 11});
+                date = selectedDateRef.current.subtract({months: 11});
             }
-            setSelectedDate(selectedDateRef.current)
+            useUpdateSelectedDate(date)
         }
 
     return (
-        <div className={`flex size-full text-2xl ${className}`}>
-            <button className='flex-auto ' onClick={() => handleClickSubtract()}>{'<'}</button>
-            <button className='flex-none pl-3 pr-3' onClick={() => setMonthSelector(false)}>{monthNames[selectedDate.month-1]}</button>
-            <button className='flex-auto'onClick={() => handleClickAdd()}>{'>'}</button>
+        <div className={`flex size-full ${className}`}>
+            <button className='flex-auto pl-4 pr-2' onClick={() => handleClickSubtract()}>{'<'}</button>
+            <button className='flex-none pl-2 pr-2' onClick={() => setMonthSelector(false)}>{monthNames[selectedDate.month-1]}</button>
+            <button className='flex-auto pl-2 pr-4'onClick={() => handleClickAdd()}>{'>'}</button>
         </div>
     )
 }

@@ -1,27 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { SelfUser } from "../../api/selfUser";
 import { Loading } from "../globalComponents/loading/Loading";
+import { useUser } from "../../contexts/UserContext";
 
 export const ValidateUser = () => {
   let user = useParams();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { handleEmailVerification, wasEmailVerified, isLoading } = useUser();
 
-  let firstRender = true;
   useEffect(() => {
-    if (!firstRender) {
-      console.log(firstRender);
-      setIsLoading(true);
-      SelfUser.validateEmail(user)
-        .then(({ res, body }) => {
-          console.log(body);
-          setIsLoading(false);
-        })
-        .catch(console.error);
-    }
+    handleEmailVerification(user)
 
-    return () => (firstRender = false);
   }, []);
   return <Loading isLoading={isLoading} color={'bg-primary-dark'} ></Loading>;
 };

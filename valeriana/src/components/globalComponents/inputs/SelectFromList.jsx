@@ -1,11 +1,11 @@
-import React, {useRef, useState} from 'react'
+import { useRef, useState } from 'react'
 import { useClickOutside } from '../../../hooks/useClickOutside';
 
-export const SelectFromList = ({placeholder, setter, elements, className, handleSubmit, children}) => {
+export const SelectFromList = ({ placeholder, setter, elements, className, handleSubmit, children }) => {
 
-  const component = useRef (null)
+  const component = useRef(null);
 
-  const [classFather, classSelection, classElements, classElement, ClassOnFatherSelection] = className ? className : [];
+  const { classFather, ClassOnFatherSelection, classSelection, classElements, classElement, classPlaceHolder, classOnPlaceHolderSelection } = className ? className : {};
 
   const [selection, setSelection] = setter;
   const [selectionToggle, setSelectionToggle] = useState(false);
@@ -26,31 +26,30 @@ export const SelectFromList = ({placeholder, setter, elements, className, handle
   }
 
   return (
-    <div ref={component} onClick={() => {selectionToggle? setSelectionToggle(false) : setSelectionToggle(true)}}
-      className={`relative flex flex-wrap cursor-pointer ${classFather? classFather : ''} ${selectionToggle? ClassOnFatherSelection : ""}`}
-    >
-      {placeholder?
-        <div className={`flex basis-full bg-tertiary-light rounded-md ${selectionToggle? "text-sm p-1 absolute top-[-15px]": ""}`}>
-          <div className={`pr-1 ${selection? "text-sm": ""}`}>{placeholder}</div>
+    <div ref={component} className='cursor-pointer' onClick={() => { selectionToggle ? setSelectionToggle(false) : setSelectionToggle(true) }}>
+      {placeholder ?
+        <div className={`flex basis-full bg-tertiary-light rounded-md ${classPlaceHolder || ""} ${selectionToggle ? classOnPlaceHolderSelection || "" : ""}`}>
+          <div className={`pr-1 ${selection ? "text-sm" : ""}`}>{placeholder}</div>
         </div> :
         <></>}
-      
-      {selectionToggle?
-      <>
-        {children}
-        <div className={`${classElements? classElements : ''} flex flex-wrap`}>
-          {elements.map((element) =>
-            <div  className={`${classElement? classElement : ''}`} onClick={async () => await  handleClick(element)}>{element}</div>
-          )}
-        </div>
-      </> : <></>
-      }
+      <div className={`relative flex flex-wrap ${classFather || ''} ${selectionToggle ? ClassOnFatherSelection || "" : ""}`}>
+        {selectionToggle ?
+          <>
+            {children}
+            <div className={`${classElements || ''} flex flex-wrap`}>
+              {elements.map((element) =>
+                <div className={`${classElement || ''}`} onClick={async () => await handleClick(element)}>{element}</div>
+              )}
+            </div>
+          </> : <></>
+        }
 
-      {selection && !selectionToggle?
-      <>
-        <div className={`${classSelection? classSelection : ''}`}>{selection}</div>
-      </> : <></>
-      }
+        {selection && !selectionToggle ?
+          <>
+            <div className={`${classSelection || ''}`}>{selection}</div>
+          </> : <></>
+        }
+      </div>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-export class meeting {
+export class Meeting {
   static async create(meetingData) {
     const options = {
       method: "POST",

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useDate } from '../../../contexts/DateContext';
 
 export const Year = () => {

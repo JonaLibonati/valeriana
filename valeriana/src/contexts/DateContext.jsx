@@ -5,73 +5,96 @@ import { useData } from "./DataContext";
 
 export const DateContext = createContext(null);
 
-export const DateProvider = ({children}) => {
+export const DateProvider = ({ children }) => {
 
-    const { config } = useData();
+  const { config } = useData();
 
-    const selectedDateRef = useRef (Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId())); // creates a new date object with the current date and time
-    const [selectedDate, setSelectedDate] = useState(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId()));
-    
-    const currentDateRef = useRef (Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId())); // creates a new date object with the current date and time
-    const [currentDate, setCurrentDate] = useState(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId()));
+  const selectedDateRef = useRef(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId())); // creates a new date object with the current date and time
+  const [selectedDate, setSelectedDate] = useState(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId()));
 
-    const [daysInSelectedMonth, setDaysSelectedMonth] = useState([]);
+  const currentDateRef = useRef(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId())); // creates a new date object with the current date and time
+  const [currentDate, setCurrentDate] = useState(Temporal.Now.zonedDateTimeISO(config.calendar_time_zone || Temporal.Now.timeZoneId()));
 
-    const [daysInSelectedYear, setDaysInSelectedYear] = useState([]);
+  const [daysInSelectedMonth, setDaysSelectedMonth] = useState([]);
 
-    const [monthSelector, setMonthSelector] = useState(false);
-    const [yearSelector, setYearSelector] = useState(false);
+  const [daysInSelectedYear, setDaysInSelectedYear] = useState([]);
+
+  const [monthSelector, setMonthSelector] = useState(false);
+  const [yearSelector, setYearSelector] = useState(false);
 
 
-    const getMonthDays = (monthNum, yearNum) => {
+  const getMonthDays = (monthNum, yearNum) => {
 
-        let array = [];
+    let array = [];
 
-        let firstDaysMonth = Temporal.PlainDate.from({year:yearNum, month:monthNum, day:1})
+    let firstDaysMonth = Temporal.PlainDate.from({ year: yearNum, month: monthNum, day: 1 })
 
-        for (let i=firstDaysMonth.dayOfWeek; i > 0; i--) {
-            array.push('')
-        }
-
-        for (let i=1; i <= firstDaysMonth.daysInMonth; i++) {
-            array.push(i)
-        }
-
-        return array
+    for (let i = firstDaysMonth.dayOfWeek; i > 0; i--) {
+      array.push({day: "", month: "", year:""})
     }
 
-    const getYearDays = (yearNum) => {
-        let array = [];
-
-        for (let i=1; i <= 12;i++) {
-            array.push(getMonthDays(i, yearNum))
-        }
-        return array
+    for (let i = 1; i <= firstDaysMonth.daysInMonth; i++) {
+      array.push(Temporal.PlainDate.from({ year: yearNum, month: monthNum, day: i }))
     }
 
-    useEffect(() => {
-        setDaysSelectedMonth(getMonthDays(selectedDateRef.current.month, selectedDateRef.current.year));
-        setDaysInSelectedYear(getYearDays(selectedDateRef.current.year));
-    }, [selectedDate]);
+    return array;
+  }
 
-    return (
-        <DateContext.Provider value={{
-            selectedDateRef,
-            selectedDate,
-            setSelectedDate,
-            currentDateRef,
-            currentDate,
-            setCurrentDate,
-            daysInSelectedMonth,
-            daysInSelectedYear,
-            monthSelector,
-            setMonthSelector,
-            yearSelector,
-            setYearSelector,
-        }}>
-            {children}
-        </DateContext.Provider>
-    );
+  const getYearDays = (yearNum) => {
+    let array = [];
+
+    for (let i = 1; i <= 12; i++) {
+      array.push(getMonthDays(i, yearNum))
+    }
+    return array
+  }
+
+  const useUpdateSelectedDate = (date) => {
+    selectedDateRef.current = date;
+    setSelectedDate(date)
+  }
+
+  const useUpdateCurrentDate = (date) => {
+    currentDateRef.current = date;
+    setCurrentDate(date)
+  }
+
+  const useUpdateTimeZone = (timeZone) => {
+    const { day, month, year, hour, minute } = selectedDateRef.current;
+    useUpdateSelectedDate(Temporal.ZonedDateTime.from({ year, month, day, hour, minute, timeZone }))
+
+    useUpdateCurrentDate(currentDateRef.current.withTimeZone(timeZone));
+  }
+
+  const handleToday = () => {
+    useUpdateSelectedDate(currentDateRef.current);
+  }
+
+  useEffect(() => {
+    setDaysSelectedMonth(getMonthDays(selectedDateRef.current.month, selectedDateRef.current.year));
+    setDaysInSelectedYear(getYearDays(selectedDateRef.current.year));
+  }, [selectedDate]);
+
+  return (
+    <DateContext.Provider value={{
+      selectedDateRef,
+      selectedDate,
+      currentDateRef,
+      currentDate,
+      daysInSelectedMonth,
+      daysInSelectedYear,
+      monthSelector,
+      setMonthSelector,
+      yearSelector,
+      setYearSelector,
+      useUpdateTimeZone,
+      useUpdateSelectedDate,
+      useUpdateCurrentDate,
+      handleToday,
+    }}>
+      {children}
+    </DateContext.Provider>
+  );
 }
 
 export const useDate = () => useContext(DateContext);

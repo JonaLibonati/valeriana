@@ -1,9 +1,9 @@
-export class google {
+export class Google {
     static async syncCalendar () {
         const res = await fetch("/v1/google/oauth");
         const body = await res.json();
 
-        window.open(body.oauthUrl, '_blank').focus();
+        return {res, body}
     }
 
     static async syncCallback ({code, scope}) {
@@ -20,27 +20,18 @@ export class google {
         return {res, body}
     }
 
-    static async setIsCalendarSync (value) {
+    static async serGoogleCalendarIsSync ({google_calendar_is_sync}) {
         const options = {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({google_calendar_is_sync: value}),
+            body: JSON.stringify({google_calendar_is_sync}),
           };
         const res = await fetch("/v1/google/calendar/isSync", options);
         const body = await res.json();
 
-        return {res, body};
-    }
-
-    static async isCalendarSync () {
-        const res = await fetch("/v1/google/calendar/isSync");
-        const body = await res.json();
-
-        console.log(body)
-
-        return {res, body};
+        return {res, body}
     }
 
     static async revokeToken () {
